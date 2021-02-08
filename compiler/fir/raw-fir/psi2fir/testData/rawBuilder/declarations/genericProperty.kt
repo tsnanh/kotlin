@@ -1,3 +1,8 @@
 fun <T> genericFoo(): T = TODO()
 
 val <T> T.generic: T get() = genericFoo()
+
+// FIR_FRAGMENT_EXPECTED LINE: 1 TEXT OFFSET: 8 LINE TEXT: fun <T> genericFoo(): T = TODO()
+// FIR_FRAGMENT_EXPECTED LINE: 1 TEXT OFFSET: 5 LINE TEXT: T
+// FIR_FRAGMENT_EXPECTED LINE: 3 TEXT OFFSET: 44 LINE TEXT: val <T> T.generic: T get() = genericFoo()
+// FIR_FRAGMENT_EXPECTED LINE: 3 TEXT OFFSET: 39 LINE TEXT: T

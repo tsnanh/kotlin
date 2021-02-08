@@ -1,3 +1,7 @@
 fun test() {
     Array<String>::class
 }
+
+// FIR_FRAGMENT_EXPECTED LINE: 1 TEXT OFFSET: 11 LINE TEXT: {
+// FIR_FRAGMENT_EXPECTED LINE: 2 TEXT OFFSET: 17 LINE TEXT: Array<String>::class
+// FIR_FRAGMENT_EXPECTED LINE: 1 TEXT OFFSET: 4 LINE TEXT: fun test() {

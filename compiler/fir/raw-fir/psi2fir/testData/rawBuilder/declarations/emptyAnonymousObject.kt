@@ -2,3 +2,7 @@
 fun test() {
     val x = object {}
 }
+
+// FIR_FRAGMENT_EXPECTED LINE: 1 TEXT OFFSET: 11 LINE TEXT: {
+// FIR_FRAGMENT_EXPECTED LINE: 2 TEXT OFFSET: 21 LINE TEXT: val x = object {}
+// FIR_FRAGMENT_EXPECTED LINE: 1 TEXT OFFSET: 4 LINE TEXT: fun test() {

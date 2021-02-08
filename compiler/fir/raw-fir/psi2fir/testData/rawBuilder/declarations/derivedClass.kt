@@ -3,3 +3,12 @@ open class Base<T>(val x: T)
 class Derived<T : Any>(x: T) : Base<T>(x)
 
 fun <T : Any> create(x: T): Derived<T> = Derived(x)
+
+// FIR_FRAGMENT_EXPECTED LINE: 1 TEXT OFFSET: 11 LINE TEXT: open class Base<T>(val x: T)
+// FIR_FRAGMENT_EXPECTED LINE: 1 TEXT OFFSET: 16 LINE TEXT: T
+// FIR_FRAGMENT_EXPECTED LINE: 1 TEXT OFFSET: 23 LINE TEXT: val x: T
+// FIR_FRAGMENT_EXPECTED LINE: 3 TEXT OFFSET: 36 LINE TEXT: class Derived<T : Any>(x: T) : Base<T>(x)
+// FIR_FRAGMENT_EXPECTED LINE: 3 TEXT OFFSET: 44 LINE TEXT: T : Any
+// FIR_FRAGMENT_EXPECTED LINE: 5 TEXT OFFSET: 87 LINE TEXT: fun <T : Any> create(x: T): Derived<T> = Derived(x)
+// FIR_FRAGMENT_EXPECTED LINE: 5 TEXT OFFSET: 78 LINE TEXT: T : Any
+// FIR_FRAGMENT_EXPECTED LINE: 5 TEXT OFFSET: 94 LINE TEXT: x: T
