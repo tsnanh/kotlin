@@ -84,10 +84,11 @@ class ReflectionReferencesGenerator(statementGenerator: StatementGenerator) : St
 
         return statementGenerator.generateCallReceiver(
             ktCallableReference,
-            resolvedDescriptor,
-            resolvedCall.dispatchReceiver, resolvedCall.extensionReceiver,
+            resolvedDescriptor, resolvedCall.dispatchReceiver,
+            resolvedCall.extensionReceiver,
+            resolvedCall.contextReceivers,
             isSafe = false
-        ).call { dispatchReceiverValue, extensionReceiverValue ->
+        ).call { dispatchReceiverValue, extensionReceiverValue, _ ->
             generateCallableReference(
                 ktCallableReference,
                 callableReferenceType,
@@ -154,10 +155,11 @@ class ReflectionReferencesGenerator(statementGenerator: StatementGenerator) : St
         val resolvedCall = callBuilder.original
         return statementGenerator.generateCallReceiver(
             ktCallableReference,
-            resolvedCall.resultingDescriptor,
-            resolvedCall.dispatchReceiver, resolvedCall.extensionReceiver,
+            resolvedCall.resultingDescriptor, resolvedCall.dispatchReceiver,
+            resolvedCall.extensionReceiver,
+            resolvedCall.contextReceivers,
             isSafe = false
-        ).call { dispatchReceiverValue, extensionReceiverValue ->
+        ).call { dispatchReceiverValue, extensionReceiverValue, _ ->
             val irDispatchReceiver = dispatchReceiverValue?.loadIfExists()
             val irExtensionReceiver = extensionReceiverValue?.loadIfExists()
             check(irDispatchReceiver == null || irExtensionReceiver == null) {
