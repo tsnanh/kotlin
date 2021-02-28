@@ -9,14 +9,18 @@ import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirPureAbstractElement
 
 fun <T : FirElement, D> T.transformSingle(transformer: FirTransformer<D>, data: D): T {
-    return (this as FirPureAbstractElement).transform<T, D>(transformer, data).single
+    @Suppress("UNCHECKED_CAST")
+    return ((this as FirPureAbstractElement).accept(transformer, data) as CompositeTransformResult<T>).single
 }
 
 fun <T : FirElement, D> MutableList<T>.transformInplace(transformer: FirTransformer<D>, data: D) {
     val iterator = this.listIterator()
     while (iterator.hasNext()) {
         val next = iterator.next() as FirPureAbstractElement
-        val result = next.transform<T, D>(transformer, data)
+
+        @Suppress("UNCHECKED_CAST")
+        val result = next.accept(transformer, data) as CompositeTransformResult<T>
+
         if (result.isSingle) {
             iterator.set(result.single)
         } else {
@@ -48,7 +52,10 @@ inline fun <T : FirElement, D> MutableList<T>.transformInplace(transformer: FirT
             is TransformData.Data<D> -> data.value
             TransformData.Nothing -> continue
         }
-        val result = next.transform<T, D>(transformer, data).single
+
+        @Suppress("UNCHECKED_CAST")
+        val result = (next.accept(transformer, data) as CompositeTransformResult<T>).single
+
         iterator.set(result)
     }
 }

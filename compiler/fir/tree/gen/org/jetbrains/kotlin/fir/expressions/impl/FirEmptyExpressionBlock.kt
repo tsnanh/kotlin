@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.expressions.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirImplementationDetail
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
@@ -25,6 +26,17 @@ class FirEmptyExpressionBlock : FirBlock() {
     override val statements: List<FirStatement> get() = emptyList()
     override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformBlock(this, data) as R
+        else visitor.visitBlock(this, data)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformBlock(this, data) as CompositeTransformResult<E>
+    }
+
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         typeRef.accept(visitor, data)
     }
@@ -43,7 +55,7 @@ class FirEmptyExpressionBlock : FirBlock() {
     }
 
     override fun <D> transformOtherChildren(transformer: FirTransformer<D>, data: D): FirEmptyExpressionBlock {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         return this
     }
 

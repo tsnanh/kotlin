@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.fir.declarations.impl
 
 import org.jetbrains.kotlin.descriptors.ClassKind
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
@@ -52,6 +53,17 @@ internal class FirRegularClassImpl(
         symbol.bind(this)
     }
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformRegularClass(this, data) as R
+        else visitor.visitRegularClass(this, data)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformRegularClass(this, data) as CompositeTransformResult<E>
+    }
+
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         annotations.forEach { it.accept(visitor, data) }
         typeParameters.forEach { it.accept(visitor, data) }
@@ -65,7 +77,7 @@ internal class FirRegularClassImpl(
         transformAnnotations(transformer, data)
         transformTypeParameters(transformer, data)
         transformStatus(transformer, data)
-        controlFlowGraphReference = controlFlowGraphReference?.transformSingle(transformer, data)
+        controlFlowGraphReference = controlFlowGraphReference?.accept(transformer, data)?.single as FirControlFlowGraphReference?
         transformDeclarations(transformer, data)
         companionObject = declarations.asSequence().filterIsInstance<FirRegularClass>().firstOrNull { it.status.isCompanion }
         transformSuperTypeRefs(transformer, data)
@@ -83,7 +95,7 @@ internal class FirRegularClassImpl(
     }
 
     override fun <D> transformStatus(transformer: FirTransformer<D>, data: D): FirRegularClassImpl {
-        status = status.transformSingle(transformer, data)
+        status = status.accept(transformer, data).single as FirDeclarationStatus
         return this
     }
 
@@ -93,7 +105,7 @@ internal class FirRegularClassImpl(
     }
 
     override fun <D> transformCompanionObject(transformer: FirTransformer<D>, data: D): FirRegularClassImpl {
-        companionObject = companionObject?.transformSingle(transformer, data)
+        companionObject = companionObject?.accept(transformer, data)?.single as FirRegularClass?
         return this
     }
 

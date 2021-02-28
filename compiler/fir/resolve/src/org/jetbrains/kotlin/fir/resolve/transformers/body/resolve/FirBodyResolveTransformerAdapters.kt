@@ -36,6 +36,7 @@ class FirBodyResolveTransformerAdapter(session: FirSession, scopeSession: ScopeS
     }
 
     override fun transformFile(file: FirFile, data: Nothing?): CompositeTransformResult<FirFile> {
-        return file.transform(transformer, ResolutionMode.ContextIndependent)
+        @Suppress("UNCHECKED_CAST")
+        return file.accept(transformer, ResolutionMode.ContextIndependent) as CompositeTransformResult<FirFile>
     }
 }

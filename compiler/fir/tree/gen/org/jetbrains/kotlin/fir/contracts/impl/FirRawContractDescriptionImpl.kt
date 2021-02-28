@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.contracts.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.contracts.FirRawContractDescription
 import org.jetbrains.kotlin.fir.expressions.FirExpression
@@ -19,6 +20,17 @@ internal class FirRawContractDescriptionImpl(
     override val source: FirSourceElement?,
     override val rawEffects: MutableList<FirExpression>,
 ) : FirRawContractDescription() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformRawContractDescription(this, data) as R
+        else visitor.visitRawContractDescription(this, data)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformRawContractDescription(this, data) as CompositeTransformResult<E>
+    }
+
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         rawEffects.forEach { it.accept(visitor, data) }
     }

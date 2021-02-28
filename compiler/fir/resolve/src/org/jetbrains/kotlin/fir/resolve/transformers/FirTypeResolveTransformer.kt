@@ -33,7 +33,8 @@ fun <F : FirClass<F>> F.runTypeResolvePhaseForLocalClass(
 ): F {
     val transformer = FirTypeResolveTransformer(session, scopeSession, currentScopeList)
 
-    return this.transform<F, Nothing?>(transformer, null).single
+    @Suppress("UNCHECKED_CAST")
+    return (this.accept(transformer, null) as CompositeTransformResult<F>).single
 }
 
 class FirTypeResolveTransformer(

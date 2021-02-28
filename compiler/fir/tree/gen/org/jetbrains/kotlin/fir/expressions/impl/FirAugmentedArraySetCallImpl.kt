@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.expressions.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirAugmentedArraySetCall
@@ -27,6 +28,17 @@ internal class FirAugmentedArraySetCallImpl(
     override val operation: FirOperation,
     override var calleeReference: FirReference,
 ) : FirAugmentedArraySetCall() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformAugmentedArraySetCall(this, data) as R
+        else visitor.visitAugmentedArraySetCall(this, data)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformAugmentedArraySetCall(this, data) as CompositeTransformResult<E>
+    }
+
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         annotations.forEach { it.accept(visitor, data) }
         assignCall.accept(visitor, data)
@@ -36,9 +48,9 @@ internal class FirAugmentedArraySetCallImpl(
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirAugmentedArraySetCallImpl {
         transformAnnotations(transformer, data)
-        assignCall = assignCall.transformSingle(transformer, data)
-        setGetBlock = setGetBlock.transformSingle(transformer, data)
-        calleeReference = calleeReference.transformSingle(transformer, data)
+        assignCall = assignCall.accept(transformer, data).single as FirFunctionCall
+        setGetBlock = setGetBlock.accept(transformer, data).single as FirBlock
+        calleeReference = calleeReference.accept(transformer, data).single as FirReference
         return this
     }
 

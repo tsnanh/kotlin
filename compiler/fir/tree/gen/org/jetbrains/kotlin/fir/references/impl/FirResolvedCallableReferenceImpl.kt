@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.references.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.references.FirResolvedCallableReference
 import org.jetbrains.kotlin.fir.resolve.calls.CallableReferenceMappedArguments
@@ -26,6 +27,17 @@ internal class FirResolvedCallableReferenceImpl(
     override val mappedArguments: CallableReferenceMappedArguments,
 ) : FirResolvedCallableReference() {
     override val candidateSymbol: AbstractFirBasedSymbol<*>? get() = null
+
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformResolvedCallableReference(this, data) as R
+        else visitor.visitResolvedCallableReference(this, data)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformResolvedCallableReference(this, data) as CompositeTransformResult<E>
+    }
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {}
 

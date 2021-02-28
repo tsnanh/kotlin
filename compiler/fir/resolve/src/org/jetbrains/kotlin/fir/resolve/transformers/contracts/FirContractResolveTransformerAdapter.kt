@@ -16,7 +16,6 @@ import org.jetbrains.kotlin.fir.resolve.transformers.AdapterForResolveProcessor
 import org.jetbrains.kotlin.fir.resolve.transformers.FirTransformerBasedResolveProcessor
 import org.jetbrains.kotlin.fir.resolve.transformers.ReturnTypeCalculatorForFullBodyResolve
 import org.jetbrains.kotlin.fir.resolve.transformers.body.resolve.BodyResolveContext
-import org.jetbrains.kotlin.fir.resolve.transformers.body.resolve.FirAbstractBodyResolveTransformer
 import org.jetbrains.kotlin.fir.visitors.CompositeTransformResult
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
 import org.jetbrains.kotlin.fir.visitors.compose
@@ -35,7 +34,8 @@ class FirContractResolveTransformerAdapter(session: FirSession, scopeSession: Sc
     }
 
     override fun transformFile(file: FirFile, data: Nothing?): CompositeTransformResult<FirDeclaration> {
-        return file.transform(transformer, ResolutionMode.ContextIndependent)
+        @Suppress("UNCHECKED_CAST")
+        return file.accept(transformer, ResolutionMode.ContextIndependent) as CompositeTransformResult<FirDeclaration>
     }
 }
 

@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.expressions.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirLabel
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
@@ -25,6 +26,17 @@ internal class FirDoWhileLoopImpl(
     override var condition: FirExpression,
     override var label: FirLabel?,
 ) : FirDoWhileLoop() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformDoWhileLoop(this, data) as R
+        else visitor.visitDoWhileLoop(this, data)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformDoWhileLoop(this, data) as CompositeTransformResult<E>
+    }
+
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         annotations.forEach { it.accept(visitor, data) }
         block.accept(visitor, data)
@@ -45,18 +57,18 @@ internal class FirDoWhileLoopImpl(
     }
 
     override fun <D> transformBlock(transformer: FirTransformer<D>, data: D): FirDoWhileLoopImpl {
-        block = block.transformSingle(transformer, data)
+        block = block.accept(transformer, data).single as FirBlock
         return this
     }
 
     override fun <D> transformCondition(transformer: FirTransformer<D>, data: D): FirDoWhileLoopImpl {
-        condition = condition.transformSingle(transformer, data)
+        condition = condition.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformOtherChildren(transformer: FirTransformer<D>, data: D): FirDoWhileLoopImpl {
         transformAnnotations(transformer, data)
-        label = label?.transformSingle(transformer, data)
+        label = label?.accept(transformer, data)?.single as FirLabel?
         return this
     }
 }

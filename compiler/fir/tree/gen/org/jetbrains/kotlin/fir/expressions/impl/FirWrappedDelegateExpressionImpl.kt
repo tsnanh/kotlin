@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.expressions.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirExpression
@@ -25,6 +26,17 @@ internal class FirWrappedDelegateExpressionImpl(
 ) : FirWrappedDelegateExpression() {
     override val typeRef: FirTypeRef get() = expression.typeRef
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformWrappedDelegateExpression(this, data) as R
+        else visitor.visitWrappedDelegateExpression(this, data)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformWrappedDelegateExpression(this, data) as CompositeTransformResult<E>
+    }
+
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         annotations.forEach { it.accept(visitor, data) }
         expression.accept(visitor, data)
@@ -33,8 +45,8 @@ internal class FirWrappedDelegateExpressionImpl(
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirWrappedDelegateExpressionImpl {
         transformAnnotations(transformer, data)
-        expression = expression.transformSingle(transformer, data)
-        delegateProvider = delegateProvider.transformSingle(transformer, data)
+        expression = expression.accept(transformer, data).single as FirExpression
+        delegateProvider = delegateProvider.accept(transformer, data).single as FirExpression
         return this
     }
 

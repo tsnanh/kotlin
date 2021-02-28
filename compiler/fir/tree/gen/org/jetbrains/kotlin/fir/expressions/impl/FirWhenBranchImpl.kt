@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.expressions.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirExpression
@@ -21,6 +22,17 @@ internal class FirWhenBranchImpl(
     override var condition: FirExpression,
     override var result: FirBlock,
 ) : FirWhenBranch() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformWhenBranch(this, data) as R
+        else visitor.visitWhenBranch(this, data)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformWhenBranch(this, data) as CompositeTransformResult<E>
+    }
+
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         condition.accept(visitor, data)
         result.accept(visitor, data)
@@ -34,12 +46,12 @@ internal class FirWhenBranchImpl(
     }
 
     override fun <D> transformCondition(transformer: FirTransformer<D>, data: D): FirWhenBranchImpl {
-        condition = condition.transformSingle(transformer, data)
+        condition = condition.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformResult(transformer: FirTransformer<D>, data: D): FirWhenBranchImpl {
-        result = result.transformSingle(transformer, data)
+        result = result.accept(transformer, data).single as FirBlock
         return this
     }
 

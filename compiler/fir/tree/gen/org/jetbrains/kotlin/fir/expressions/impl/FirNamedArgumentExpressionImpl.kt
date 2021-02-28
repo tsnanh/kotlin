@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.expressions.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirExpression
@@ -27,6 +28,17 @@ internal class FirNamedArgumentExpressionImpl(
 ) : FirNamedArgumentExpression() {
     override val typeRef: FirTypeRef get() = expression.typeRef
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformNamedArgumentExpression(this, data) as R
+        else visitor.visitNamedArgumentExpression(this, data)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformNamedArgumentExpression(this, data) as CompositeTransformResult<E>
+    }
+
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         annotations.forEach { it.accept(visitor, data) }
         expression.accept(visitor, data)
@@ -34,7 +46,7 @@ internal class FirNamedArgumentExpressionImpl(
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirNamedArgumentExpressionImpl {
         transformAnnotations(transformer, data)
-        expression = expression.transformSingle(transformer, data)
+        expression = expression.accept(transformer, data).single as FirExpression
         return this
     }
 

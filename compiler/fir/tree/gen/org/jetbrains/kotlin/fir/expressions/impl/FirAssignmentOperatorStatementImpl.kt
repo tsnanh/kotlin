@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.expressions.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirAssignmentOperatorStatement
@@ -24,6 +25,17 @@ internal class FirAssignmentOperatorStatementImpl(
     override var leftArgument: FirExpression,
     override var rightArgument: FirExpression,
 ) : FirAssignmentOperatorStatement() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformAssignmentOperatorStatement(this, data) as R
+        else visitor.visitAssignmentOperatorStatement(this, data)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformAssignmentOperatorStatement(this, data) as CompositeTransformResult<E>
+    }
+
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         annotations.forEach { it.accept(visitor, data) }
         leftArgument.accept(visitor, data)
@@ -43,12 +55,12 @@ internal class FirAssignmentOperatorStatementImpl(
     }
 
     override fun <D> transformLeftArgument(transformer: FirTransformer<D>, data: D): FirAssignmentOperatorStatementImpl {
-        leftArgument = leftArgument.transformSingle(transformer, data)
+        leftArgument = leftArgument.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformRightArgument(transformer: FirTransformer<D>, data: D): FirAssignmentOperatorStatementImpl {
-        rightArgument = rightArgument.transformSingle(transformer, data)
+        rightArgument = rightArgument.accept(transformer, data).single as FirExpression
         return this
     }
 }

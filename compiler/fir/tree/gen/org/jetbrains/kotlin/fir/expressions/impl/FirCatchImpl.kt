@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.expressions.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.expressions.FirBlock
@@ -21,6 +22,17 @@ internal class FirCatchImpl(
     override var parameter: FirValueParameter,
     override var block: FirBlock,
 ) : FirCatch() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformCatch(this, data) as R
+        else visitor.visitCatch(this, data)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformCatch(this, data) as CompositeTransformResult<E>
+    }
+
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         parameter.accept(visitor, data)
         block.accept(visitor, data)
@@ -34,12 +46,12 @@ internal class FirCatchImpl(
     }
 
     override fun <D> transformParameter(transformer: FirTransformer<D>, data: D): FirCatchImpl {
-        parameter = parameter.transformSingle(transformer, data)
+        parameter = parameter.accept(transformer, data).single as FirValueParameter
         return this
     }
 
     override fun <D> transformBlock(transformer: FirTransformer<D>, data: D): FirCatchImpl {
-        block = block.transformSingle(transformer, data)
+        block = block.accept(transformer, data).single as FirBlock
         return this
     }
 
