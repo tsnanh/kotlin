@@ -31,7 +31,7 @@ internal class FirErrorExpressionImpl(
     }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirErrorExpressionImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         return this
     }
 

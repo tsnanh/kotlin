@@ -48,17 +48,17 @@ internal class FirBinaryLogicExpressionImpl(
     }
 
     override fun <D> transformLeftOperand(transformer: FirTransformer<D>, data: D): FirBinaryLogicExpressionImpl {
-        leftOperand = leftOperand.transformSingle(transformer, data)
+        leftOperand = leftOperand.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformRightOperand(transformer: FirTransformer<D>, data: D): FirBinaryLogicExpressionImpl {
-        rightOperand = rightOperand.transformSingle(transformer, data)
+        rightOperand = rightOperand.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformOtherChildren(transformer: FirTransformer<D>, data: D): FirBinaryLogicExpressionImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
         return this
     }

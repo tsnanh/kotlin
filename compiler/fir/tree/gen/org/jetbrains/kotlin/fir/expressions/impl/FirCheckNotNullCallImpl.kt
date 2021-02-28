@@ -33,9 +33,9 @@ internal class FirCheckNotNullCallImpl(
     }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirCheckNotNullCallImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
-        argumentList = argumentList.transformSingle(transformer, data)
+        argumentList = argumentList.accept(transformer, data).single as FirArgumentList
         transformCalleeReference(transformer, data)
         return this
     }
@@ -46,7 +46,7 @@ internal class FirCheckNotNullCallImpl(
     }
 
     override fun <D> transformCalleeReference(transformer: FirTransformer<D>, data: D): FirCheckNotNullCallImpl {
-        calleeReference = calleeReference.transformSingle(transformer, data)
+        calleeReference = calleeReference.accept(transformer, data).single as FirReference
         return this
     }
 

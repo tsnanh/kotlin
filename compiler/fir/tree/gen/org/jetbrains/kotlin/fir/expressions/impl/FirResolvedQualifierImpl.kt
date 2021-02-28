@@ -41,7 +41,7 @@ internal class FirResolvedQualifierImpl(
     }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirResolvedQualifierImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
         transformTypeArguments(transformer, data)
         return this

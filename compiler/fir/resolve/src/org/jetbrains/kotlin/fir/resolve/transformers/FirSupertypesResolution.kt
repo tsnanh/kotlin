@@ -55,7 +55,8 @@ class FirSupertypeResolverTransformer(
         checkSessionConsistency(file)
         file.accept(supertypeResolverVisitor)
         supertypeComputationSession.breakLoops(session)
-        return file.transform(applySupertypesTransformer, null)
+        @Suppress("UNCHECKED_CAST")
+        return file.accept(applySupertypesTransformer, null) as CompositeTransformResult<FirFile>
     }
 }
 
@@ -76,7 +77,8 @@ fun <F : FirClass<F>> F.runSupertypeResolvePhaseForLocalClass(
     supertypeComputationSession.breakLoops(session)
 
     val applySupertypesTransformer = FirApplySupertypesTransformer(supertypeComputationSession)
-    return this.transform<F, Nothing?>(applySupertypesTransformer, null).single
+    @Suppress("UNCHECKED_CAST")
+    return (this.accept(applySupertypesTransformer, null) as CompositeTransformResult<F>).single
 }
 
 private class FirApplySupertypesTransformer(

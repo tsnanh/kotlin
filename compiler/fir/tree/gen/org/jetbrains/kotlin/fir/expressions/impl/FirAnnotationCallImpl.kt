@@ -39,7 +39,7 @@ internal class FirAnnotationCallImpl(
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirAnnotationCallImpl {
         transformAnnotations(transformer, data)
-        argumentList = argumentList.transformSingle(transformer, data)
+        argumentList = argumentList.accept(transformer, data).single as FirArgumentList
         transformCalleeReference(transformer, data)
         transformAnnotationTypeRef(transformer, data)
         return this
@@ -51,12 +51,12 @@ internal class FirAnnotationCallImpl(
     }
 
     override fun <D> transformCalleeReference(transformer: FirTransformer<D>, data: D): FirAnnotationCallImpl {
-        calleeReference = calleeReference.transformSingle(transformer, data)
+        calleeReference = calleeReference.accept(transformer, data).single as FirReference
         return this
     }
 
     override fun <D> transformAnnotationTypeRef(transformer: FirTransformer<D>, data: D): FirAnnotationCallImpl {
-        annotationTypeRef = annotationTypeRef.transformSingle(transformer, data)
+        annotationTypeRef = annotationTypeRef.accept(transformer, data).single as FirTypeRef
         return this
     }
 

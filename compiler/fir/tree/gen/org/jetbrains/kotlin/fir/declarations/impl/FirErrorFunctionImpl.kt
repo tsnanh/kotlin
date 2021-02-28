@@ -59,7 +59,7 @@ internal class FirErrorFunctionImpl(
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirErrorFunctionImpl {
         transformAnnotations(transformer, data)
         transformReturnTypeRef(transformer, data)
-        controlFlowGraphReference = controlFlowGraphReference?.transformSingle(transformer, data)
+        controlFlowGraphReference = controlFlowGraphReference?.accept(transformer, data)?.single as FirControlFlowGraphReference?
         transformValueParameters(transformer, data)
         transformTypeParameters(transformer, data)
         return this
@@ -71,7 +71,7 @@ internal class FirErrorFunctionImpl(
     }
 
     override fun <D> transformReturnTypeRef(transformer: FirTransformer<D>, data: D): FirErrorFunctionImpl {
-        returnTypeRef = returnTypeRef.transformSingle(transformer, data)
+        returnTypeRef = returnTypeRef.accept(transformer, data).single as FirTypeRef
         return this
     }
 

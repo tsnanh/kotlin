@@ -70,7 +70,7 @@ internal class FirPrimaryConstructor(
         transformReturnTypeRef(transformer, data)
         transformReceiverTypeRef(transformer, data)
         transformTypeParameters(transformer, data)
-        controlFlowGraphReference = controlFlowGraphReference?.transformSingle(transformer, data)
+        controlFlowGraphReference = controlFlowGraphReference?.accept(transformer, data)?.single as FirControlFlowGraphReference?
         transformValueParameters(transformer, data)
         transformStatus(transformer, data)
         transformAnnotations(transformer, data)
@@ -80,12 +80,12 @@ internal class FirPrimaryConstructor(
     }
 
     override fun <D> transformReturnTypeRef(transformer: FirTransformer<D>, data: D): FirPrimaryConstructor {
-        returnTypeRef = returnTypeRef.transformSingle(transformer, data)
+        returnTypeRef = returnTypeRef.accept(transformer, data).single as FirTypeRef
         return this
     }
 
     override fun <D> transformReceiverTypeRef(transformer: FirTransformer<D>, data: D): FirPrimaryConstructor {
-        receiverTypeRef = receiverTypeRef?.transformSingle(transformer, data)
+        receiverTypeRef = receiverTypeRef?.accept(transformer, data)?.single as FirTypeRef?
         return this
     }
 
@@ -100,7 +100,7 @@ internal class FirPrimaryConstructor(
     }
 
     override fun <D> transformStatus(transformer: FirTransformer<D>, data: D): FirPrimaryConstructor {
-        status = status.transformSingle(transformer, data)
+        status = status.accept(transformer, data).single as FirDeclarationStatus
         return this
     }
 
@@ -110,12 +110,12 @@ internal class FirPrimaryConstructor(
     }
 
     override fun <D> transformDelegatedConstructor(transformer: FirTransformer<D>, data: D): FirPrimaryConstructor {
-        delegatedConstructor = delegatedConstructor?.transformSingle(transformer, data)
+        delegatedConstructor = delegatedConstructor?.accept(transformer, data)?.single as FirDelegatedConstructorCall?
         return this
     }
 
     override fun <D> transformBody(transformer: FirTransformer<D>, data: D): FirPrimaryConstructor {
-        body = body?.transformSingle(transformer, data)
+        body = body?.accept(transformer, data)?.single as FirBlock?
         return this
     }
 

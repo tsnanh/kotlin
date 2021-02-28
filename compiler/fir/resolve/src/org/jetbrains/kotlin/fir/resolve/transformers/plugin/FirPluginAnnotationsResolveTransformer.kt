@@ -67,7 +67,8 @@ class FirPluginAnnotationsResolveTransformer(
 
         annotationTransformer.metaAnnotations = metaAnnotations
         val newAnnotations = LinkedHashMultimap.create<AnnotationFqn, FirRegularClass>()
-        this.transform<FirFile, Multimap<AnnotationFqn, FirRegularClass>>(annotationTransformer, newAnnotations)
+        @Suppress("UNCHECKED_CAST")
+        this.accept(annotationTransformer, newAnnotations) as CompositeTransformResult<FirFile>
         return newAnnotations
     }
 }

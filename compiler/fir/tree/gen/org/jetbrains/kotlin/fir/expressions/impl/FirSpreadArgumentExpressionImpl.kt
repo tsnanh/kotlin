@@ -32,7 +32,7 @@ internal class FirSpreadArgumentExpressionImpl(
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirSpreadArgumentExpressionImpl {
         transformAnnotations(transformer, data)
-        expression = expression.transformSingle(transformer, data)
+        expression = expression.accept(transformer, data).single as FirExpression
         return this
     }
 

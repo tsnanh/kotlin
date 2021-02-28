@@ -47,7 +47,7 @@ internal class FirThisReceiverExpressionImpl(
     }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirThisReceiverExpressionImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
         transformTypeArguments(transformer, data)
         explicitReceiver = explicitReceiver?.transformSingle(transformer, data)
@@ -72,22 +72,22 @@ internal class FirThisReceiverExpressionImpl(
     }
 
     override fun <D> transformExplicitReceiver(transformer: FirTransformer<D>, data: D): FirThisReceiverExpressionImpl {
-        explicitReceiver = explicitReceiver?.transformSingle(transformer, data)
+        explicitReceiver = explicitReceiver?.accept(transformer, data)?.single as FirExpression?
         return this
     }
 
     override fun <D> transformDispatchReceiver(transformer: FirTransformer<D>, data: D): FirThisReceiverExpressionImpl {
-        dispatchReceiver = dispatchReceiver.transformSingle(transformer, data)
+        dispatchReceiver = dispatchReceiver.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformExtensionReceiver(transformer: FirTransformer<D>, data: D): FirThisReceiverExpressionImpl {
-        extensionReceiver = extensionReceiver.transformSingle(transformer, data)
+        extensionReceiver = extensionReceiver.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformCalleeReference(transformer: FirTransformer<D>, data: D): FirThisReceiverExpressionImpl {
-        calleeReference = calleeReference.transformSingle(transformer, data)
+        calleeReference = calleeReference.accept(transformer, data).single as FirThisReference
         return this
     }
 

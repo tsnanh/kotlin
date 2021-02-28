@@ -54,7 +54,8 @@ fun <F : FirClass<F>> F.runStatusResolveForLocalClass(
         FirCompositeScope(scopesForLocalClass)
     )
 
-    return this.transform<F, Nothing?>(transformer, null).single
+    @Suppress("UNCHECKED_CAST")
+    return (this.accept(transformer, null) as CompositeTransformResult<F>).single
 }
 
 abstract class ResolvedStatusCalculator {

@@ -32,10 +32,10 @@ internal class FirVarargArgumentsExpressionImpl(
     }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirVarargArgumentsExpressionImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
         arguments.transformInplace(transformer, data)
-        varargElementType = varargElementType.transformSingle(transformer, data)
+        varargElementType = varargElementType.accept(transformer, data).single as FirTypeRef
         return this
     }
 

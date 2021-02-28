@@ -106,7 +106,8 @@ abstract class AbstractRawFirBuilderTestCase : KtParsingTestCase(
 
     private fun FirFile.transformChildren(): Set<FirElement> =
         ConsistencyTransformer().let {
-            this@transformChildren.transform<FirFile, Unit>(it, Unit)
+            @Suppress("UNCHECKED_CAST")
+            this@transformChildren.accept(it, Unit) as CompositeTransformResult<FirFile>
             it.result
         }
 

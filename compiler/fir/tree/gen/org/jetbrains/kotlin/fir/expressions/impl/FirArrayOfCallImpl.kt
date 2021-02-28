@@ -30,9 +30,9 @@ internal class FirArrayOfCallImpl(
     }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirArrayOfCallImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
-        argumentList = argumentList.transformSingle(transformer, data)
+        argumentList = argumentList.accept(transformer, data).single as FirArgumentList
         return this
     }
 

@@ -91,32 +91,32 @@ internal class FirPropertyImpl(
     }
 
     override fun <D> transformReturnTypeRef(transformer: FirTransformer<D>, data: D): FirPropertyImpl {
-        returnTypeRef = returnTypeRef.transformSingle(transformer, data)
+        returnTypeRef = returnTypeRef.accept(transformer, data).single as FirTypeRef
         return this
     }
 
     override fun <D> transformReceiverTypeRef(transformer: FirTransformer<D>, data: D): FirPropertyImpl {
-        receiverTypeRef = receiverTypeRef?.transformSingle(transformer, data)
+        receiverTypeRef = receiverTypeRef?.accept(transformer, data)?.single as FirTypeRef?
         return this
     }
 
     override fun <D> transformInitializer(transformer: FirTransformer<D>, data: D): FirPropertyImpl {
-        initializer = initializer?.transformSingle(transformer, data)
+        initializer = initializer?.accept(transformer, data)?.single as FirExpression?
         return this
     }
 
     override fun <D> transformDelegate(transformer: FirTransformer<D>, data: D): FirPropertyImpl {
-        delegate = delegate?.transformSingle(transformer, data)
+        delegate = delegate?.accept(transformer, data)?.single as FirExpression?
         return this
     }
 
     override fun <D> transformGetter(transformer: FirTransformer<D>, data: D): FirPropertyImpl {
-        getter = getter?.transformSingle(transformer, data)
+        getter = getter?.accept(transformer, data)?.single as FirPropertyAccessor?
         return this
     }
 
     override fun <D> transformSetter(transformer: FirTransformer<D>, data: D): FirPropertyImpl {
-        setter = setter?.transformSingle(transformer, data)
+        setter = setter?.accept(transformer, data)?.single as FirPropertyAccessor?
         return this
     }
 
@@ -131,13 +131,13 @@ internal class FirPropertyImpl(
     }
 
     override fun <D> transformStatus(transformer: FirTransformer<D>, data: D): FirPropertyImpl {
-        status = status.transformSingle(transformer, data)
+        status = status.accept(transformer, data).single as FirDeclarationStatus
         return this
     }
 
     override fun <D> transformOtherChildren(transformer: FirTransformer<D>, data: D): FirPropertyImpl {
         transformAnnotations(transformer, data)
-        controlFlowGraphReference = controlFlowGraphReference?.transformSingle(transformer, data)
+        controlFlowGraphReference = controlFlowGraphReference?.accept(transformer, data)?.single as FirControlFlowGraphReference?
         return this
     }
 

@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.resolve.ResolutionMode
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
 import org.jetbrains.kotlin.fir.resolve.providers.FirProvider
 import org.jetbrains.kotlin.fir.resolve.symbolProvider
+import org.jetbrains.kotlin.fir.visitors.CompositeTransformResult
 import org.jetbrains.kotlin.idea.fir.low.level.api.element.builder.FirTowerDataContextCollector
 import org.jetbrains.kotlin.idea.fir.low.level.api.element.builder.getNonLocalContainingOrThisDeclaration
 import org.jetbrains.kotlin.idea.fir.low.level.api.file.builder.FirFileBuilder
@@ -165,7 +166,7 @@ internal class FirLazyDeclarationResolver(
         )
 
         firFileBuilder.firPhaseRunner.runPhaseWithCustomResolve(phase) {
-            containerFirFile.transform<FirFile, ResolutionMode>(transformer, ResolutionMode.ContextDependent)
+            containerFirFile.accept(transformer, ResolutionMode.ContextDependent)
         }
     }
 

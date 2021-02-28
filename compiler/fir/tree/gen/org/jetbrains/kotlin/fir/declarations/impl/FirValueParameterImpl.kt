@@ -70,7 +70,7 @@ internal class FirValueParameterImpl(
     }
 
     override fun <D> transformReturnTypeRef(transformer: FirTransformer<D>, data: D): FirValueParameterImpl {
-        returnTypeRef = returnTypeRef.transformSingle(transformer, data)
+        returnTypeRef = returnTypeRef.accept(transformer, data).single as FirTypeRef
         return this
     }
 
@@ -101,8 +101,8 @@ internal class FirValueParameterImpl(
 
     override fun <D> transformOtherChildren(transformer: FirTransformer<D>, data: D): FirValueParameterImpl {
         transformAnnotations(transformer, data)
-        controlFlowGraphReference = controlFlowGraphReference?.transformSingle(transformer, data)
-        defaultValue = defaultValue?.transformSingle(transformer, data)
+        controlFlowGraphReference = controlFlowGraphReference?.accept(transformer, data)?.single as FirControlFlowGraphReference?
+        defaultValue = defaultValue?.accept(transformer, data)?.single as FirExpression?
         return this
     }
 

@@ -42,8 +42,8 @@ internal class FirAnonymousInitializerImpl(
     }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirAnonymousInitializerImpl {
-        controlFlowGraphReference = controlFlowGraphReference?.transformSingle(transformer, data)
-        body = body?.transformSingle(transformer, data)
+        controlFlowGraphReference = controlFlowGraphReference?.accept(transformer, data)?.single as FirControlFlowGraphReference?
+        body = body?.accept(transformer, data)?.single as FirBlock?
         return this
     }
 

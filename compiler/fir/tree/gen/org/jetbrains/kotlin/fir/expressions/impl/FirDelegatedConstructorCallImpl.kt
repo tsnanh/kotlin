@@ -41,8 +41,8 @@ internal class FirDelegatedConstructorCallImpl(
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirDelegatedConstructorCallImpl {
         transformAnnotations(transformer, data)
-        argumentList = argumentList.transformSingle(transformer, data)
-        constructedTypeRef = constructedTypeRef.transformSingle(transformer, data)
+        argumentList = argumentList.accept(transformer, data).single as FirArgumentList
+        constructedTypeRef = constructedTypeRef.accept(transformer, data).single as FirTypeRef
         transformCalleeReference(transformer, data)
         return this
     }
@@ -53,12 +53,12 @@ internal class FirDelegatedConstructorCallImpl(
     }
 
     override fun <D> transformDispatchReceiver(transformer: FirTransformer<D>, data: D): FirDelegatedConstructorCallImpl {
-        dispatchReceiver = dispatchReceiver.transformSingle(transformer, data)
+        dispatchReceiver = dispatchReceiver.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformCalleeReference(transformer: FirTransformer<D>, data: D): FirDelegatedConstructorCallImpl {
-        calleeReference = calleeReference.transformSingle(transformer, data)
+        calleeReference = calleeReference.accept(transformer, data).single as FirReference
         return this
     }
 

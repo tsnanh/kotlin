@@ -49,7 +49,7 @@ open class FirFunctionCallImpl @FirImplementationDetail constructor(
     }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirFunctionCallImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
         transformTypeArguments(transformer, data)
         explicitReceiver = explicitReceiver?.transformSingle(transformer, data)
@@ -59,7 +59,7 @@ open class FirFunctionCallImpl @FirImplementationDetail constructor(
         if (extensionReceiver !== explicitReceiver && extensionReceiver !== dispatchReceiver) {
             extensionReceiver = extensionReceiver.transformSingle(transformer, data)
         }
-        argumentList = argumentList.transformSingle(transformer, data)
+        argumentList = argumentList.accept(transformer, data).single as FirArgumentList
         transformCalleeReference(transformer, data)
         return this
     }
@@ -75,22 +75,22 @@ open class FirFunctionCallImpl @FirImplementationDetail constructor(
     }
 
     override fun <D> transformExplicitReceiver(transformer: FirTransformer<D>, data: D): FirFunctionCallImpl {
-        explicitReceiver = explicitReceiver?.transformSingle(transformer, data)
+        explicitReceiver = explicitReceiver?.accept(transformer, data)?.single as FirExpression?
         return this
     }
 
     override fun <D> transformDispatchReceiver(transformer: FirTransformer<D>, data: D): FirFunctionCallImpl {
-        dispatchReceiver = dispatchReceiver.transformSingle(transformer, data)
+        dispatchReceiver = dispatchReceiver.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformExtensionReceiver(transformer: FirTransformer<D>, data: D): FirFunctionCallImpl {
-        extensionReceiver = extensionReceiver.transformSingle(transformer, data)
+        extensionReceiver = extensionReceiver.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformCalleeReference(transformer: FirTransformer<D>, data: D): FirFunctionCallImpl {
-        calleeReference = calleeReference.transformSingle(transformer, data)
+        calleeReference = calleeReference.accept(transformer, data).single as FirNamedReference
         return this
     }
 

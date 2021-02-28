@@ -34,6 +34,7 @@ abstract class FirPartialBodyResolveTransformer(
         }
 
     override fun <E : FirElement> transformElement(element: E, data: ResolutionMode): CompositeTransformResult<E> {
-        return element.transform(transformer, data)
+        @Suppress("UNCHECKED_CAST")
+        return element.accept(transformer, data) as CompositeTransformResult<E>
     }
 }

@@ -37,7 +37,9 @@ fun SmartPrinter.printImplementation(implementation: Implementation) {
             is FieldWithDefault -> origin.transform()
 
             is FirField ->
-                println("$name = ${name}${call()}transformSingle(transformer, data)")
+//                println("$name = ${name}${call()}transformSingle(transformer, data)")
+                println("$name = ${name}${call()}accept(transformer, data)${call()}single as ${element.type}${if (nullable) "?" else ""}")
+//                println("$name = ${name}${call()}let { transformer.transform${(element as Element).name}(it, data) }?.single as ${element.type}${if (nullable) "?" else ""}")
 
             is FieldList -> {
                 println("${name}.transformInplace(transformer, data)")

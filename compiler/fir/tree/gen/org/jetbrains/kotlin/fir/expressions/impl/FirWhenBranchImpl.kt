@@ -34,12 +34,12 @@ internal class FirWhenBranchImpl(
     }
 
     override fun <D> transformCondition(transformer: FirTransformer<D>, data: D): FirWhenBranchImpl {
-        condition = condition.transformSingle(transformer, data)
+        condition = condition.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformResult(transformer: FirTransformer<D>, data: D): FirWhenBranchImpl {
-        result = result.transformSingle(transformer, data)
+        result = result.accept(transformer, data).single as FirBlock
         return this
     }
 

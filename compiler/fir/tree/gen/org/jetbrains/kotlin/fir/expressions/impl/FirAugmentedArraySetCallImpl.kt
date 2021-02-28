@@ -36,9 +36,9 @@ internal class FirAugmentedArraySetCallImpl(
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirAugmentedArraySetCallImpl {
         transformAnnotations(transformer, data)
-        assignCall = assignCall.transformSingle(transformer, data)
-        setGetBlock = setGetBlock.transformSingle(transformer, data)
-        calleeReference = calleeReference.transformSingle(transformer, data)
+        assignCall = assignCall.accept(transformer, data).single as FirFunctionCall
+        setGetBlock = setGetBlock.accept(transformer, data).single as FirBlock
+        calleeReference = calleeReference.accept(transformer, data).single as FirReference
         return this
     }
 

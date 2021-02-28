@@ -29,7 +29,7 @@ internal class FirResolvedReifiedParameterReferenceImpl(
     }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirResolvedReifiedParameterReferenceImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
         return this
     }

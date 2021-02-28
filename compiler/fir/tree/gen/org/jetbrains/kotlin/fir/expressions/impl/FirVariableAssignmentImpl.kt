@@ -64,7 +64,7 @@ internal class FirVariableAssignmentImpl(
     }
 
     override fun <D> transformCalleeReference(transformer: FirTransformer<D>, data: D): FirVariableAssignmentImpl {
-        calleeReference = calleeReference.transformSingle(transformer, data)
+        calleeReference = calleeReference.accept(transformer, data).single as FirReference
         return this
     }
 
@@ -79,22 +79,22 @@ internal class FirVariableAssignmentImpl(
     }
 
     override fun <D> transformExplicitReceiver(transformer: FirTransformer<D>, data: D): FirVariableAssignmentImpl {
-        explicitReceiver = explicitReceiver?.transformSingle(transformer, data)
+        explicitReceiver = explicitReceiver?.accept(transformer, data)?.single as FirExpression?
         return this
     }
 
     override fun <D> transformDispatchReceiver(transformer: FirTransformer<D>, data: D): FirVariableAssignmentImpl {
-        dispatchReceiver = dispatchReceiver.transformSingle(transformer, data)
+        dispatchReceiver = dispatchReceiver.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformExtensionReceiver(transformer: FirTransformer<D>, data: D): FirVariableAssignmentImpl {
-        extensionReceiver = extensionReceiver.transformSingle(transformer, data)
+        extensionReceiver = extensionReceiver.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformRValue(transformer: FirTransformer<D>, data: D): FirVariableAssignmentImpl {
-        rValue = rValue.transformSingle(transformer, data)
+        rValue = rValue.accept(transformer, data).single as FirExpression
         return this
     }
 

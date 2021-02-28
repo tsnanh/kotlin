@@ -33,8 +33,8 @@ internal class FirWrappedDelegateExpressionImpl(
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirWrappedDelegateExpressionImpl {
         transformAnnotations(transformer, data)
-        expression = expression.transformSingle(transformer, data)
-        delegateProvider = delegateProvider.transformSingle(transformer, data)
+        expression = expression.accept(transformer, data).single as FirExpression
+        delegateProvider = delegateProvider.accept(transformer, data).single as FirExpression
         return this
     }
 

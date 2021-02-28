@@ -42,7 +42,7 @@ internal class FirErrorResolvedQualifierImpl(
     }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirErrorResolvedQualifierImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
         transformTypeArguments(transformer, data)
         return this

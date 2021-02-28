@@ -47,14 +47,14 @@ internal class FirTypeOperatorCallImpl(
     }
 
     override fun <D> transformConversionTypeRef(transformer: FirTransformer<D>, data: D): FirTypeOperatorCallImpl {
-        conversionTypeRef = conversionTypeRef.transformSingle(transformer, data)
+        conversionTypeRef = conversionTypeRef.accept(transformer, data).single as FirTypeRef
         return this
     }
 
     override fun <D> transformOtherChildren(transformer: FirTransformer<D>, data: D): FirTypeOperatorCallImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
-        argumentList = argumentList.transformSingle(transformer, data)
+        argumentList = argumentList.accept(transformer, data).single as FirArgumentList
         return this
     }
 

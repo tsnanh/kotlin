@@ -417,7 +417,8 @@ open class FirExpressionsResolveTransformer(transformer: FirBodyResolveTransform
                             extensionReceiver = it.extensionReceiver
                         }
                     }
-                assignment.transform(transformer, ResolutionMode.ContextIndependent)
+                @Suppress("UNCHECKED_CAST")
+                assignment.accept(transformer, ResolutionMode.ContextIndependent) as CompositeTransformResult<FirStatement>
             }
             else -> {
                 val operatorCallSymbol = operatorCallReference?.candidateSymbol

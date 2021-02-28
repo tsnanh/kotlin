@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.fir.resolve.transformers
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirFile
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
+import org.jetbrains.kotlin.fir.visitors.CompositeTransformResult
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
 
 @RequiresOptIn(message = "Should be used just only in resolve processor")
@@ -26,6 +27,7 @@ abstract class FirTransformerBasedResolveProcessor(
     abstract val transformer: FirTransformer<Nothing?>
 
     fun processFile(file: FirFile) {
-        file.transform<FirFile, Nothing?>(transformer, null)
+        @Suppress("UNCHECKED_CAST")
+        file.accept(transformer, null) as CompositeTransformResult<FirFile>
     }
 }

@@ -34,9 +34,9 @@ internal class FirComparisonExpressionImpl(
     }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirComparisonExpressionImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
-        compareToCall = compareToCall.transformSingle(transformer, data)
+        compareToCall = compareToCall.accept(transformer, data).single as FirFunctionCall
         return this
     }
 

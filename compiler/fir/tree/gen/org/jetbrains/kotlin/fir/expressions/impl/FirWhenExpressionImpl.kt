@@ -59,7 +59,7 @@ internal class FirWhenExpressionImpl(
     }
 
     override fun <D> transformCalleeReference(transformer: FirTransformer<D>, data: D): FirWhenExpressionImpl {
-        calleeReference = calleeReference.transformSingle(transformer, data)
+        calleeReference = calleeReference.accept(transformer, data).single as FirReference
         return this
     }
 
@@ -79,7 +79,7 @@ internal class FirWhenExpressionImpl(
     }
 
     override fun <D> transformOtherChildren(transformer: FirTransformer<D>, data: D): FirWhenExpressionImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
         return this
     }

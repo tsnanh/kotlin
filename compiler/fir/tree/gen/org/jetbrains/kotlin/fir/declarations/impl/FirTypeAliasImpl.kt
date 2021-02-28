@@ -51,13 +51,13 @@ internal class FirTypeAliasImpl(
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirTypeAliasImpl {
         transformStatus(transformer, data)
         transformTypeParameters(transformer, data)
-        expandedTypeRef = expandedTypeRef.transformSingle(transformer, data)
+        expandedTypeRef = expandedTypeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
         return this
     }
 
     override fun <D> transformStatus(transformer: FirTransformer<D>, data: D): FirTypeAliasImpl {
-        status = status.transformSingle(transformer, data)
+        status = status.accept(transformer, data).single as FirDeclarationStatus
         return this
     }
 

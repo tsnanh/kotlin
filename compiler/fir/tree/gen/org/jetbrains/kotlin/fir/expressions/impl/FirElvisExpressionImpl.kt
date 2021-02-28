@@ -37,7 +37,7 @@ internal class FirElvisExpressionImpl(
     }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElvisExpressionImpl {
-        typeRef = typeRef.transformSingle(transformer, data)
+        typeRef = typeRef.accept(transformer, data).single as FirTypeRef
         transformAnnotations(transformer, data)
         transformCalleeReference(transformer, data)
         transformLhs(transformer, data)
@@ -51,17 +51,17 @@ internal class FirElvisExpressionImpl(
     }
 
     override fun <D> transformCalleeReference(transformer: FirTransformer<D>, data: D): FirElvisExpressionImpl {
-        calleeReference = calleeReference.transformSingle(transformer, data)
+        calleeReference = calleeReference.accept(transformer, data).single as FirReference
         return this
     }
 
     override fun <D> transformLhs(transformer: FirTransformer<D>, data: D): FirElvisExpressionImpl {
-        lhs = lhs.transformSingle(transformer, data)
+        lhs = lhs.accept(transformer, data).single as FirExpression
         return this
     }
 
     override fun <D> transformRhs(transformer: FirTransformer<D>, data: D): FirElvisExpressionImpl {
-        rhs = rhs.transformSingle(transformer, data)
+        rhs = rhs.accept(transformer, data).single as FirExpression
         return this
     }
 
