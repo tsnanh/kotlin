@@ -339,7 +339,6 @@ public class ClassFileFactory implements OutputFileCollection {
 
     private static final class ClassBuilderAndSourceFileList extends OutAndSourceFileList {
         private final ClassBuilder classBuilder;
-        private byte[] cachedBytes = null;
 
         private ClassBuilderAndSourceFileList(ClassBuilder classBuilder, List<File> sourceFiles) {
             super(sourceFiles);
@@ -348,11 +347,8 @@ public class ClassFileFactory implements OutputFileCollection {
 
         @Override
         public byte[] asBytes(ClassBuilderFactory factory) {
-            if (cachedBytes != null) return cachedBytes;
             synchronized(this) {
-                if (cachedBytes != null) return cachedBytes;
-                cachedBytes = factory.asBytes(classBuilder);
-                return cachedBytes;
+                return factory.asBytes(classBuilder);
             }
         }
 
