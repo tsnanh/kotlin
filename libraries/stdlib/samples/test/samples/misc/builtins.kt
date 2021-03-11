@@ -5,8 +5,7 @@
 
 package samples.misc
 
-import samples.assertPrints
-import samples.Sample
+import samples.*
 
 class Builtins {
 
