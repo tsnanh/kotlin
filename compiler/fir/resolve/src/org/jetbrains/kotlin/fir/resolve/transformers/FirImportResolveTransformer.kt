@@ -27,8 +27,8 @@ class FirImportResolveProcessor(session: FirSession, scopeSession: ScopeSession)
 open class FirImportResolveTransformer protected constructor(
     final override val session: FirSession,
     phase: FirResolvePhase
-) : FirAbstractTreeTransformer<Nothing?>(phase) {
-    override fun <E : FirElement> transformElement(element: E, data: Nothing?): CompositeTransformResult<E> {
+) : FirAbstractTreeTransformer<Any?>(phase) {
+    override fun <E : FirElement> transformElement(element: E, data: Any?): CompositeTransformResult<E> {
         return element.compose()
     }
 
@@ -36,13 +36,13 @@ open class FirImportResolveTransformer protected constructor(
 
     private val symbolProvider: FirSymbolProvider = session.symbolProvider
 
-    override fun transformFile(file: FirFile, data: Nothing?): CompositeTransformResult<FirFile> {
+    override fun transformFile(file: FirFile, data: Any?): CompositeTransformResult<FirFile> {
         checkSessionConsistency(file)
         file.replaceResolvePhase(transformerPhase)
         return file.also { it.transformChildren(this, null) }.compose()
     }
 
-    override fun transformImport(import: FirImport, data: Nothing?): CompositeTransformResult<FirImport> {
+    override fun transformImport(import: FirImport, data: Any?): CompositeTransformResult<FirImport> {
         val fqName = import.importedFqName?.takeUnless { it.isRoot } ?: return import.compose()
 
         if (!fqName.isAcceptable) return import.compose()

@@ -323,14 +323,14 @@ class FirCallCompletionResultsWriterTransformer(
         }.compose()
     }
 
-    private inner class TypeUpdaterForDelegateArguments : FirTransformer<Nothing?>() {
-        override fun <E : FirElement> transformElement(element: E, data: Nothing?): CompositeTransformResult<E> {
+    private inner class TypeUpdaterForDelegateArguments : FirTransformer<Any?>() {
+        override fun <E : FirElement> transformElement(element: E, data: Any?): CompositeTransformResult<E> {
             return element.compose()
         }
 
         override fun transformQualifiedAccessExpression(
             qualifiedAccessExpression: FirQualifiedAccessExpression,
-            data: Nothing?
+            data: Any?
         ): CompositeTransformResult<FirStatement> {
             val originalType = qualifiedAccessExpression.typeRef.coneType
             val substitutedReceiverType = finalSubstitutor.substituteOrNull(originalType) ?: return qualifiedAccessExpression.compose()
@@ -527,15 +527,15 @@ class FirCallCompletionResultsWriterTransformer(
     private fun transformImplicitTypeRefInAnonymousFunction(
         anonymousFunction: FirAnonymousFunction
     ): CompositeTransformResult<FirStatement> {
-        val implicitTypeTransformer = object : FirDefaultTransformer<Nothing?>() {
-            override fun <E : FirElement> transformElement(element: E, data: Nothing?): CompositeTransformResult<E> {
+        val implicitTypeTransformer = object : FirDefaultTransformer<Any?>() {
+            override fun <E : FirElement> transformElement(element: E, data: Any?): CompositeTransformResult<E> {
                 @Suppress("UNCHECKED_CAST")
                 return (element.transformChildren(this, data) as E).compose()
             }
 
             override fun transformImplicitTypeRef(
                 implicitTypeRef: FirImplicitTypeRef,
-                data: Nothing?
+                data: Any?
             ): CompositeTransformResult<FirTypeRef> =
                 buildErrorTypeRef {
                     source = implicitTypeRef.source
@@ -708,19 +708,19 @@ private fun FirExpression.unwrapArgument(): FirExpression = when (this) {
     else -> this
 }
 
-class FirDeclarationCompletionResultsWriter(private val finalSubstitutor: ConeSubstitutor) : FirDefaultTransformer<Nothing?>() {
-    override fun <E : FirElement> transformElement(element: E, data: Nothing?): CompositeTransformResult<E> {
+class FirDeclarationCompletionResultsWriter(private val finalSubstitutor: ConeSubstitutor) : FirDefaultTransformer<Any?>() {
+    override fun <E : FirElement> transformElement(element: E, data: Any?): CompositeTransformResult<E> {
         return element.compose()
     }
 
-    override fun transformSimpleFunction(simpleFunction: FirSimpleFunction, data: Nothing?): CompositeTransformResult<FirDeclaration> {
+    override fun transformSimpleFunction(simpleFunction: FirSimpleFunction, data: Any?): CompositeTransformResult<FirDeclaration> {
         simpleFunction.transformReturnTypeRef(this, data)
         simpleFunction.transformValueParameters(this, data)
         simpleFunction.transformReceiverTypeRef(this, data)
         return simpleFunction.compose()
     }
 
-    override fun transformProperty(property: FirProperty, data: Nothing?): CompositeTransformResult<FirDeclaration> {
+    override fun transformProperty(property: FirProperty, data: Any?): CompositeTransformResult<FirDeclaration> {
         property.transformGetter(this, data)
         property.transformSetter(this, data)
         property.transformReturnTypeRef(this, data)
@@ -730,7 +730,7 @@ class FirDeclarationCompletionResultsWriter(private val finalSubstitutor: ConeSu
 
     override fun transformPropertyAccessor(
         propertyAccessor: FirPropertyAccessor,
-        data: Nothing?
+        data: Any?
     ): CompositeTransformResult<FirDeclaration> {
         propertyAccessor.transformReturnTypeRef(this, data)
         propertyAccessor.transformValueParameters(this, data)
@@ -739,13 +739,13 @@ class FirDeclarationCompletionResultsWriter(private val finalSubstitutor: ConeSu
 
     override fun transformValueParameter(
         valueParameter: FirValueParameter,
-        data: Nothing?
+        data: Any?
     ): CompositeTransformResult<FirStatement> {
         valueParameter.transformReturnTypeRef(this, data)
         return valueParameter.compose()
     }
 
-    override fun transformTypeRef(typeRef: FirTypeRef, data: Nothing?): CompositeTransformResult<FirTypeRef> {
+    override fun transformTypeRef(typeRef: FirTypeRef, data: Any?): CompositeTransformResult<FirTypeRef> {
         return finalSubstitutor.substituteOrNull(typeRef.coneType)?.let {
             typeRef.resolvedTypeFromPrototype(it)
         }?.compose() ?: typeRef.compose()

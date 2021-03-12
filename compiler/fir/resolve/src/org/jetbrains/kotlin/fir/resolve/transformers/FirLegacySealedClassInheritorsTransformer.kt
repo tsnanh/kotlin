@@ -24,12 +24,12 @@ class FirLegacySealedClassInheritorsProcessor(session: FirSession, scopeSession:
     override val transformer = FirLegacySealedClassInheritorsTransformer()
 }
 
-class FirLegacySealedClassInheritorsTransformer : FirTransformer<Nothing?>() {
-    override fun <E : FirElement> transformElement(element: E, data: Nothing?): CompositeTransformResult<E> {
+class FirLegacySealedClassInheritorsTransformer : FirTransformer<Any?>() {
+    override fun <E : FirElement> transformElement(element: E, data: Any?): CompositeTransformResult<E> {
         throw IllegalStateException("Should not be there")
     }
 
-    override fun transformFile(file: FirFile, data: Nothing?): CompositeTransformResult<FirDeclaration> {
+    override fun transformFile(file: FirFile, data: Any?): CompositeTransformResult<FirDeclaration> {
         val sealedClassInheritorsMap = mutableMapOf<FirRegularClass, MutableList<ClassId>>()
         file.accept(FirSealedClassInheritorsProcessor.InheritorsCollector, sealedClassInheritorsMap)
         if (sealedClassInheritorsMap.isEmpty()) return file.compose()

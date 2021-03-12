@@ -27,13 +27,13 @@ class FirContractResolveProcessor(session: FirSession, scopeSession: ScopeSessio
 }
 
 @AdapterForResolveProcessor
-class FirContractResolveTransformerAdapter(session: FirSession, scopeSession: ScopeSession) : FirTransformer<Nothing?>() {
+class FirContractResolveTransformerAdapter(session: FirSession, scopeSession: ScopeSession) : FirTransformer<Any?>() {
     private val transformer = FirContractResolveTransformer(session, scopeSession)
-    override fun <E : FirElement> transformElement(element: E, data: Nothing?): CompositeTransformResult<E> {
+    override fun <E : FirElement> transformElement(element: E, data: Any?): CompositeTransformResult<E> {
         return element.compose()
     }
 
-    override fun transformFile(file: FirFile, data: Nothing?): CompositeTransformResult<FirDeclaration> {
+    override fun transformFile(file: FirFile, data: Any?): CompositeTransformResult<FirDeclaration> {
         @Suppress("UNCHECKED_CAST")
         return file.accept(transformer, ResolutionMode.ContextIndependent) as CompositeTransformResult<FirDeclaration>
     }

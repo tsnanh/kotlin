@@ -32,7 +32,7 @@ import org.jetbrains.kotlin.fir.visitors.CompositeTransformResult
 abstract class FirAbstractTreeTransformerWithSuperTypes(
     phase: FirResolvePhase,
     protected val scopeSession: ScopeSession
-) : FirAbstractTreeTransformer<Nothing?>(phase) {
+) : FirAbstractTreeTransformer<Any?>(phase) {
     protected val scopes = mutableListOf<FirScope>()
     protected val towerScope = FirCompositeScope(scopes.asReversed())
 
@@ -49,7 +49,7 @@ abstract class FirAbstractTreeTransformerWithSuperTypes(
 
     protected fun resolveNestedClassesSupertypes(
         firClass: FirClass<*>,
-        data: Nothing?
+        data: Any?
     ): CompositeTransformResult<FirStatement> {
         firClass.replaceResolvePhase(transformerPhase)
         return withScopeCleanup {

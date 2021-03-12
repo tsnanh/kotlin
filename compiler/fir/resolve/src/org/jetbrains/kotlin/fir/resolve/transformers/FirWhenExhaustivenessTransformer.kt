@@ -28,7 +28,7 @@ import org.jetbrains.kotlin.fir.visitors.FirTransformer
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.fir.visitors.compose
 
-class FirWhenExhaustivenessTransformer(private val bodyResolveComponents: BodyResolveComponents) : FirTransformer<Nothing?>() {
+class FirWhenExhaustivenessTransformer(private val bodyResolveComponents: BodyResolveComponents) : FirTransformer<Any?>() {
     companion object {
         private val exhaustivenessCheckers = listOf(
             WhenOnBooleanExhaustivenessChecker,
@@ -37,11 +37,11 @@ class FirWhenExhaustivenessTransformer(private val bodyResolveComponents: BodyRe
         )
     }
 
-    override fun <E : FirElement> transformElement(element: E, data: Nothing?): CompositeTransformResult<E> {
+    override fun <E : FirElement> transformElement(element: E, data: Any?): CompositeTransformResult<E> {
         throw IllegalArgumentException("Should not be there")
     }
 
-    override fun transformWhenExpression(whenExpression: FirWhenExpression, data: Nothing?): CompositeTransformResult<FirStatement> {
+    override fun transformWhenExpression(whenExpression: FirWhenExpression, data: Any?): CompositeTransformResult<FirStatement> {
         processExhaustivenessCheck(whenExpression)
         return whenExpression.compose()
     }

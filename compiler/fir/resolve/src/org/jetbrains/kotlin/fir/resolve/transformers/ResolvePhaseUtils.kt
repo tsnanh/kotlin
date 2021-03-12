@@ -66,11 +66,11 @@ private class FirDummyTransformerBasedProcessor(
     session: FirSession,
     scopeSession: ScopeSession
 ) : FirTransformerBasedResolveProcessor(session, scopeSession) {
-    override val transformer: FirTransformer<Nothing?>
+    override val transformer: FirTransformer<Any?>
         get() = DummyTransformer
 
-    private object DummyTransformer : FirTransformer<Nothing?>() {
-        override fun <E : FirElement> transformElement(element: E, data: Nothing?): CompositeTransformResult<E> {
+    private object DummyTransformer : FirTransformer<Any?>() {
+        override fun <E : FirElement> transformElement(element: E, data: Any?): CompositeTransformResult<E> {
             return element.compose()
         }
     }

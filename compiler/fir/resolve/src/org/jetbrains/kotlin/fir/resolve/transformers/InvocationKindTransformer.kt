@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.fir.visitors.CompositeTransformResult
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
 import org.jetbrains.kotlin.fir.visitors.compose
 
-object InvocationKindTransformer : FirTransformer<Nothing?>() {
+object InvocationKindTransformer : FirTransformer<Any?>() {
     private object ArgumentsTransformer : FirTransformer<Pair<Map<FirExpression, EventOccurrencesRange>, EventOccurrencesRange?>>() {
         override fun <E : FirElement> transformElement(element: E, data: Pair<Map<FirExpression, EventOccurrencesRange>, EventOccurrencesRange?>): CompositeTransformResult<E> {
             return element.compose()
@@ -54,11 +54,11 @@ object InvocationKindTransformer : FirTransformer<Nothing?>() {
         }
     }
 
-    override fun <E : FirElement> transformElement(element: E, data: Nothing?): CompositeTransformResult<E> {
+    override fun <E : FirElement> transformElement(element: E, data: Any?): CompositeTransformResult<E> {
         return element.compose()
     }
 
-    override fun transformFunctionCall(functionCall: FirFunctionCall, data: Nothing?): CompositeTransformResult<FirStatement> {
+    override fun transformFunctionCall(functionCall: FirFunctionCall, data: Any?): CompositeTransformResult<FirStatement> {
         val calleeReference = functionCall.calleeReference as? FirNamedReferenceWithCandidate ?: return functionCall.compose()
         val argumentMapping = calleeReference.candidate.argumentMapping ?: return functionCall.compose()
         val function = calleeReference.candidateSymbol.fir as? FirSimpleFunction ?: return functionCall.compose()

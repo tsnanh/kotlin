@@ -41,19 +41,19 @@ class FirSupertypeResolverProcessor(session: FirSession, scopeSession: ScopeSess
 class FirSupertypeResolverTransformer(
     override val session: FirSession,
     scopeSession: ScopeSession
-) : FirAbstractPhaseTransformer<Nothing?>(FirResolvePhase.SUPER_TYPES) {
+) : FirAbstractPhaseTransformer<Any?>(FirResolvePhase.SUPER_TYPES) {
     private val supertypeComputationSession = SupertypeComputationSession()
 
     private val supertypeResolverVisitor = FirSupertypeResolverVisitor(session, supertypeComputationSession, scopeSession)
     private val applySupertypesTransformer = FirApplySupertypesTransformer(supertypeComputationSession)
 
-    override fun <E : FirElement> transformElement(element: E, data: Nothing?): CompositeTransformResult<E> {
+    override fun <E : FirElement> transformElement(element: E, data: Any?): CompositeTransformResult<E> {
         return element.compose()
     }
 
-    override fun transformFile(file: FirFile, data: Nothing?): CompositeTransformResult<FirFile> {
+    override fun transformFile(file: FirFile, data: Any?): CompositeTransformResult<FirFile> {
         checkSessionConsistency(file)
-        file.accept(supertypeResolverVisitor)
+        file.accept(supertypeResolverVisitor, null)
         supertypeComputationSession.breakLoops(session)
         @Suppress("UNCHECKED_CAST")
         return file.accept(applySupertypesTransformer, null) as CompositeTransformResult<FirFile>
@@ -73,7 +73,7 @@ fun <F : FirClass<F>> F.runSupertypeResolvePhaseForLocalClass(
         localClassesNavigationInfo
     )
 
-    this.accept(supertypeResolverVisitor)
+    this.accept(supertypeResolverVisitor, null)
     supertypeComputationSession.breakLoops(session)
 
     val applySupertypesTransformer = FirApplySupertypesTransformer(supertypeComputationSession)
@@ -83,18 +83,18 @@ fun <F : FirClass<F>> F.runSupertypeResolvePhaseForLocalClass(
 
 private class FirApplySupertypesTransformer(
     private val supertypeComputationSession: SupertypeComputationSession
-) : FirDefaultTransformer<Nothing?>() {
-    override fun <E : FirElement> transformElement(element: E, data: Nothing?): CompositeTransformResult<E> {
+) : FirDefaultTransformer<Any?>() {
+    override fun <E : FirElement> transformElement(element: E, data: Any?): CompositeTransformResult<E> {
         return element.compose()
     }
 
-    override fun transformFile(file: FirFile, data: Nothing?): CompositeTransformResult<FirDeclaration> {
+    override fun transformFile(file: FirFile, data: Any?): CompositeTransformResult<FirDeclaration> {
         file.replaceResolvePhase(FirResolvePhase.SUPER_TYPES)
 
         return (file.transformChildren(this, null) as FirFile).compose()
     }
 
-    override fun transformRegularClass(regularClass: FirRegularClass, data: Nothing?): CompositeTransformResult<FirStatement> {
+    override fun transformRegularClass(regularClass: FirRegularClass, data: Any?): CompositeTransformResult<FirStatement> {
         applyResolvedSupertypesToClass(regularClass)
 
         return (regularClass.transformChildren(this, null) as FirRegularClass).compose()
@@ -110,7 +110,7 @@ private class FirApplySupertypesTransformer(
         firClass.replaceResolvePhase(FirResolvePhase.SUPER_TYPES)
     }
 
-    override fun transformAnonymousObject(anonymousObject: FirAnonymousObject, data: Nothing?): CompositeTransformResult<FirStatement> {
+    override fun transformAnonymousObject(anonymousObject: FirAnonymousObject, data: Any?): CompositeTransformResult<FirStatement> {
         applyResolvedSupertypesToClass(anonymousObject)
 
         return super.transformAnonymousObject(anonymousObject, data)
@@ -124,7 +124,7 @@ private class FirApplySupertypesTransformer(
         return status.supertypeRefs
     }
 
-    override fun transformTypeAlias(typeAlias: FirTypeAlias, data: Nothing?): CompositeTransformResult<FirDeclaration> {
+    override fun transformTypeAlias(typeAlias: FirTypeAlias, data: Any?): CompositeTransformResult<FirDeclaration> {
         if (typeAlias.expandedTypeRef is FirResolvedTypeRef) return typeAlias.compose()
         val supertypeRefs = getResolvedSupertypeRefs(typeAlias)
 
@@ -179,10 +179,10 @@ private class FirSupertypeResolverVisitor(
     private val scopeSession: ScopeSession,
     private val scopeForLocalClass: PersistentList<FirScope>? = null,
     private val localClassesNavigationInfo: LocalClassesNavigationInfo? = null
-) : FirDefaultVisitorVoid() {
+) : FirDefaultVisitor<Unit, Any?>() {
     private val supertypeGenerationExtensions = session.extensionService.supertypeGenerators
 
-    override fun visitElement(element: FirElement) {}
+    override fun visitElement(element: FirElement, data: Any?) {}
 
     private fun prepareFileScopes(file: FirFile): ScopePersistentList {
         return supertypeComputationSession.getOrPutFileScope(file) {
@@ -271,14 +271,14 @@ private class FirSupertypeResolverVisitor(
         return resolvedTypesRefs
     }
 
-    override fun visitRegularClass(regularClass: FirRegularClass) {
+    override fun visitRegularClass(regularClass: FirRegularClass, data: Any?) {
         resolveSpecificClassLikeSupertypes(regularClass, regularClass.superTypeRefs)
-        regularClass.acceptChildren(this)
+        regularClass.acceptChildren(this, null)
     }
 
-    override fun visitAnonymousObject(anonymousObject: FirAnonymousObject) {
+    override fun visitAnonymousObject(anonymousObject: FirAnonymousObject, data: Any?) {
         resolveSpecificClassLikeSupertypes(anonymousObject, anonymousObject.superTypeRefs)
-        anonymousObject.acceptChildren(this)
+        anonymousObject.acceptChildren(this, null)
     }
 
     fun resolveSpecificClassLikeSupertypes(
@@ -324,7 +324,7 @@ private class FirSupertypeResolverVisitor(
         }
     }
 
-    override fun visitTypeAlias(typeAlias: FirTypeAlias) {
+    override fun visitTypeAlias(typeAlias: FirTypeAlias, data: Any?) {
         // TODO: this if is a temporary hack for built-in types (because we can't load file for them)
         if (typeAlias.expandedTypeRef is FirResolvedTypeRef) {
             return
@@ -344,7 +344,7 @@ private class FirSupertypeResolverVisitor(
             if (type is ConeClassLikeType) {
                 val expansionTypeAlias = type.lookupTag.toSymbol(session)?.safeAs<FirTypeAliasSymbol>()?.fir
                 if (expansionTypeAlias != null) {
-                    visitTypeAlias(expansionTypeAlias)
+                    visitTypeAlias(expansionTypeAlias, null)
                 }
             }
 
@@ -352,8 +352,8 @@ private class FirSupertypeResolverVisitor(
         }
     }
 
-    override fun visitFile(file: FirFile) {
-        file.acceptChildren(this)
+    override fun visitFile(file: FirFile, data: Any?) {
+        file.acceptChildren(this, null)
     }
 }
 

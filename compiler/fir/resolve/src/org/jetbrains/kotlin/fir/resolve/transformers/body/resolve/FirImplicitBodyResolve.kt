@@ -35,7 +35,7 @@ class FirImplicitTypeBodyResolveProcessor(
 }
 
 @AdapterForResolveProcessor
-class FirImplicitTypeBodyResolveTransformerAdapter(session: FirSession, scopeSession: ScopeSession) : FirTransformer<Nothing?>() {
+class FirImplicitTypeBodyResolveTransformerAdapter(session: FirSession, scopeSession: ScopeSession) : FirTransformer<Any?>() {
     private val implicitBodyResolveComputationSession = ImplicitBodyResolveComputationSession()
     private val returnTypeCalculator = ReturnTypeCalculatorWithJump(session, scopeSession, implicitBodyResolveComputationSession)
 
@@ -47,11 +47,11 @@ class FirImplicitTypeBodyResolveTransformerAdapter(session: FirSession, scopeSes
         returnTypeCalculator
     )
 
-    override fun <E : FirElement> transformElement(element: E, data: Nothing?): CompositeTransformResult<E> {
+    override fun <E : FirElement> transformElement(element: E, data: Any?): CompositeTransformResult<E> {
         return element.compose()
     }
 
-    override fun transformFile(file: FirFile, data: Nothing?): CompositeTransformResult<FirFile> {
+    override fun transformFile(file: FirFile, data: Any?): CompositeTransformResult<FirFile> {
         @Suppress("UNCHECKED_CAST")
         return file.accept(transformer, ResolutionMode.ContextIndependent) as CompositeTransformResult<FirFile>
     }
