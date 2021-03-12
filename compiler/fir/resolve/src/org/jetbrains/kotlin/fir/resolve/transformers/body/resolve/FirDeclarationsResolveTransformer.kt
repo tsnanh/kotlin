@@ -106,7 +106,7 @@ open class FirDeclarationsResolveTransformer(transformer: FirBodyResolveTransfor
         return FirMemberTypeParameterScope(declaration)
     }
 
-    protected inline fun <T> withTypeParametersOf(declaration: FirMemberDeclaration, crossinline l: () -> T): T {
+    protected inline fun <T> withTypeParametersOf(declaration: FirMemberDeclaration, l: () -> T): T {
         val scope = createTypeParameterScope(declaration)
         return context.withTowerDataCleanup {
             scope?.let { context.addNonLocalTowerDataElement(it.asTowerDataElement(isLocal = false)) }

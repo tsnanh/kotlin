@@ -250,7 +250,7 @@ private class FirSupertypeResolverVisitor(
         return result.pushIfNotNull(classLikeDeclaration.typeParametersScope())
     }
 
-    private fun resolveSpecificClassLikeSupertypes(
+    private inline fun resolveSpecificClassLikeSupertypes(
         classLikeDeclaration: FirClassLikeDeclaration<*>,
         resolveSuperTypeRefs: (FirTransformer<FirScope>, FirScope) -> List<FirResolvedTypeRef>
     ): List<FirTypeRef> {

@@ -43,18 +43,18 @@ abstract class FirAbstractBodyResolveTransformer(phase: FirResolvePhase) : FirAb
 
     final override val session: FirSession get() = components.session
 
-    protected inline fun <T> withLocalScopeCleanup(crossinline l: () -> T): T {
+    protected inline fun <T> withLocalScopeCleanup(l: () -> T): T {
         return context.withTowerDataCleanup(l)
     }
 
-    protected inline fun <T> withNewLocalScope(crossinline l: () -> T): T {
+    protected inline fun <T> withNewLocalScope(l: () -> T): T {
         return context.withTowerDataCleanup {
             addNewLocalScope()
             l()
         }
     }
 
-    protected inline fun <T> withLocalScope(localScope: FirLocalScope?, crossinline l: () -> T): T {
+    protected inline fun <T> withLocalScope(localScope: FirLocalScope?, l: () -> T): T {
         if (localScope == null) return l()
         return context.withTowerDataCleanup {
             addLocalScope(localScope)
@@ -62,7 +62,7 @@ abstract class FirAbstractBodyResolveTransformer(phase: FirResolvePhase) : FirAb
         }
     }
 
-    protected inline fun <T> withPrimaryConstructorParameters(includeProperties: Boolean, crossinline l: () -> T): T {
+    protected inline fun <T> withPrimaryConstructorParameters(includeProperties: Boolean, l: () -> T): T {
         return context.withTowerDataCleanup {
             addLocalScope(
                 if (includeProperties) context.getPrimaryConstructorAllParametersScope()
@@ -90,7 +90,7 @@ abstract class FirAbstractBodyResolveTransformer(phase: FirResolvePhase) : FirAb
     }
 
     @OptIn(PrivateForInline::class)
-    internal inline fun <T> withFullBodyResolve(crossinline l: () -> T): T {
+    internal inline fun <T> withFullBodyResolve(l: () -> T): T {
         val shouldSwitchMode = implicitTypeOnly
         if (shouldSwitchMode) {
             implicitTypeOnly = false

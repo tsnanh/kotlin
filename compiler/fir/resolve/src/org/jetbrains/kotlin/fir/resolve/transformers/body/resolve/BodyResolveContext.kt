@@ -92,7 +92,7 @@ class BodyResolveContext(
         towerDataContextsForClassParts.primaryConstructorAllParametersScope
 
     @OptIn(PrivateForInline::class)
-    inline fun <T> withContainer(declaration: FirDeclaration, crossinline f: () -> T): T {
+    inline fun <T> withContainer(declaration: FirDeclaration, f: () -> T): T {
         val oldContainers = containers
         containers = containers.add(declaration)
         return try {
