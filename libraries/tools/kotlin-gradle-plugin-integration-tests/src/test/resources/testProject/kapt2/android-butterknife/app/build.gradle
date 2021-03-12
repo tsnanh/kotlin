@@ -6,6 +6,11 @@ android {
     compileSdkVersion 23
     buildToolsVersion "25.0.2"
 
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
     defaultConfig {
         applicationId "org.example.kotlin.butterknife"
         minSdkVersion 15
