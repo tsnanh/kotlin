@@ -19,6 +19,12 @@ internal class FirLabelImpl(
     override var source: FirSourceElement?,
     override val name: String,
 ) : FirLabel() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformLabel(this, data) as R
+        else visitor.visitLabel(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformLabel(this, data) as CompositeTransformResult<E>

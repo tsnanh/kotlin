@@ -32,6 +32,12 @@ internal class FirCallableReferenceAccessImpl(
     override var calleeReference: FirNamedReference,
     override var hasQuestionMarkAtLHS: Boolean,
 ) : FirCallableReferenceAccess() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformCallableReferenceAccess(this, data) as R
+        else visitor.visitCallableReferenceAccess(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformCallableReferenceAccess(this, data) as CompositeTransformResult<E>

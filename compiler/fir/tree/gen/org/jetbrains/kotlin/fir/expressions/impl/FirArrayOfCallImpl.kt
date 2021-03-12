@@ -24,6 +24,12 @@ internal class FirArrayOfCallImpl(
     override val annotations: MutableList<FirAnnotationCall>,
     override var argumentList: FirArgumentList,
 ) : FirArrayOfCall() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformArrayOfCall(this, data) as R
+        else visitor.visitArrayOfCall(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformArrayOfCall(this, data) as CompositeTransformResult<E>

@@ -33,6 +33,12 @@ internal class FirDelegatedConstructorCallImpl(
     override var calleeReference: FirReference = if (isThis) FirExplicitThisReference(source, null) else FirExplicitSuperReference(source, null, constructedTypeRef)
     override val isSuper: Boolean get() = !isThis
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformDelegatedConstructorCall(this, data) as R
+        else visitor.visitDelegatedConstructorCall(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformDelegatedConstructorCall(this, data) as CompositeTransformResult<E>

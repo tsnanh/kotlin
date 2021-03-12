@@ -33,6 +33,12 @@ internal class FirThisReceiverExpressionImpl(
     override var dispatchReceiver: FirExpression = FirNoReceiverExpression
     override var extensionReceiver: FirExpression = FirNoReceiverExpression
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformThisReceiverExpression(this, data) as R
+        else visitor.visitThisReceiverExpression(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformThisReceiverExpression(this, data) as CompositeTransformResult<E>

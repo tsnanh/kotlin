@@ -20,6 +20,12 @@ internal class FirEffectDeclarationImpl(
     override var source: FirSourceElement?,
     override val effect: ConeEffectDeclaration,
 ) : FirEffectDeclaration() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformEffectDeclaration(this, data) as R
+        else visitor.visitEffectDeclaration(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformEffectDeclaration(this, data) as CompositeTransformResult<E>

@@ -27,6 +27,12 @@ internal class FirErrorExpressionImpl(
     override var typeRef: FirTypeRef = FirErrorTypeRefImpl(source, null, ConeStubDiagnostic(diagnostic))
     override val annotations: List<FirAnnotationCall> get() = emptyList()
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformErrorExpression(this, data) as R
+        else visitor.visitErrorExpression(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformErrorExpression(this, data) as CompositeTransformResult<E>

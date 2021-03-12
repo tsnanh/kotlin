@@ -22,6 +22,12 @@ internal class FirCatchImpl(
     override var parameter: FirValueParameter,
     override var block: FirBlock,
 ) : FirCatch() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformCatch(this, data) as R
+        else visitor.visitCatch(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformCatch(this, data) as CompositeTransformResult<E>

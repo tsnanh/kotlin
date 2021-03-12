@@ -18,6 +18,12 @@ import org.jetbrains.kotlin.fir.visitors.*
 internal class FirStarProjectionImpl(
     override var source: FirSourceElement?,
 ) : FirStarProjection() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformStarProjection(this, data) as R
+        else visitor.visitStarProjection(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformStarProjection(this, data) as CompositeTransformResult<E>

@@ -35,6 +35,12 @@ internal class FirFileImpl(
     override val name: String,
     override val packageFqName: FqName,
 ) : FirFile() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformFile(this, data) as R
+        else visitor.visitFile(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformFile(this, data) as CompositeTransformResult<E>

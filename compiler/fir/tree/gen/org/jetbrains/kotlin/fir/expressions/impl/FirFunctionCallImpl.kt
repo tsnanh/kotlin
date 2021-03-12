@@ -34,6 +34,12 @@ open class FirFunctionCallImpl @FirImplementationDetail constructor(
     override var argumentList: FirArgumentList,
     override var calleeReference: FirNamedReference,
 ) : FirFunctionCall() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformFunctionCall(this, data) as R
+        else visitor.visitFunctionCall(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformFunctionCall(this, data) as CompositeTransformResult<E>

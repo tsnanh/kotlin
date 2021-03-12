@@ -29,6 +29,12 @@ internal class FirTryExpressionImpl(
     override val catches: MutableList<FirCatch>,
     override var finallyBlock: FirBlock?,
 ) : FirTryExpression() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformTryExpression(this, data) as R
+        else visitor.visitTryExpression(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformTryExpression(this, data) as CompositeTransformResult<E>

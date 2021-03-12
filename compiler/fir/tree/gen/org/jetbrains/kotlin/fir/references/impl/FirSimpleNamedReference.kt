@@ -23,6 +23,12 @@ open class FirSimpleNamedReference @FirImplementationDetail constructor(
     override val name: Name,
     override val candidateSymbol: AbstractFirBasedSymbol<*>?,
 ) : FirNamedReference() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformNamedReference(this, data) as R
+        else visitor.visitNamedReference(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformNamedReference(this, data) as CompositeTransformResult<E>

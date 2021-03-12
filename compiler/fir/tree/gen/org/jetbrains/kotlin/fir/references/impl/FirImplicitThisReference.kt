@@ -22,6 +22,12 @@ internal class FirImplicitThisReference(
     override val source: FirSourceElement? get() = null
     override val labelName: String? get() = null
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformThisReference(this, data) as R
+        else visitor.visitThisReference(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformThisReference(this, data) as CompositeTransformResult<E>

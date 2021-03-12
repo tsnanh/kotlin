@@ -22,6 +22,12 @@ internal class FirWhenBranchImpl(
     override var condition: FirExpression,
     override var result: FirBlock,
 ) : FirWhenBranch() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformWhenBranch(this, data) as R
+        else visitor.visitWhenBranch(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformWhenBranch(this, data) as CompositeTransformResult<E>

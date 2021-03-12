@@ -20,6 +20,12 @@ internal class FirArgumentListImpl(
     override var source: FirSourceElement?,
     override val arguments: MutableList<FirExpression>,
 ) : FirArgumentList() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformArgumentList(this, data) as R
+        else visitor.visitArgumentList(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformArgumentList(this, data) as CompositeTransformResult<E>

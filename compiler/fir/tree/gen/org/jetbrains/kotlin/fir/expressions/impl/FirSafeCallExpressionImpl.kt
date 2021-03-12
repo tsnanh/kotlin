@@ -29,6 +29,12 @@ internal class FirSafeCallExpressionImpl(
     override val checkedSubjectRef: FirExpressionRef<FirCheckedSafeCallSubject>,
     override var regularQualifiedAccess: FirQualifiedAccess,
 ) : FirSafeCallExpression() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformSafeCallExpression(this, data) as R
+        else visitor.visitSafeCallExpression(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformSafeCallExpression(this, data) as CompositeTransformResult<E>

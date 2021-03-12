@@ -40,6 +40,12 @@ internal class FirComponentCallImpl(
     override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
     override var calleeReference: FirNamedReference = FirSimpleNamedReference(source, Name.identifier("component$componentIndex"), null)
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformComponentCall(this, data) as R
+        else visitor.visitComponentCall(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformComponentCall(this, data) as CompositeTransformResult<E>

@@ -56,6 +56,12 @@ internal class FirSimpleFunctionImpl(
         symbol.bind(this)
     }
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformSimpleFunction(this, data) as R
+        else visitor.visitSimpleFunction(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformSimpleFunction(this, data) as CompositeTransformResult<E>

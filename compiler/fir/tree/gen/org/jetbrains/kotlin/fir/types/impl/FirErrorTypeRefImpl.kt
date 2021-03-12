@@ -28,6 +28,12 @@ internal class FirErrorTypeRefImpl(
     override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
     override val type: ConeKotlinType = ConeClassErrorType(diagnostic)
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformErrorTypeRef(this, data) as R
+        else visitor.visitErrorTypeRef(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformErrorTypeRef(this, data) as CompositeTransformResult<E>

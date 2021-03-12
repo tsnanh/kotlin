@@ -127,6 +127,15 @@ fun SmartPrinter.printImplementation(implementation: Implementation) {
             fun Field.acceptString(): String = "${name}${call()}accept(visitor, data)"
             if (!isInterface && !isAbstract) {
 
+                println("override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {")
+                withIndent {
+                    println("@Suppress(\"UNCHECKED_CAST\")")
+                    println("return if (visitor is FirTransformer<D>) visitor.transform${element.name}(this, data) as R")
+                    println("else visitor.visit${element.name}(this, data)")
+                }
+                println("}")
+                println()
+
                 println("override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {")
                 withIndent {
                     println("@Suppress(\"UNCHECKED_CAST\")")

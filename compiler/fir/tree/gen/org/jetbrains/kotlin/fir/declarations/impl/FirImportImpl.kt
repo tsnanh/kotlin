@@ -23,6 +23,12 @@ internal class FirImportImpl(
     override val isAllUnder: Boolean,
     override val aliasName: Name?,
 ) : FirImport() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformImport(this, data) as R
+        else visitor.visitImport(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformImport(this, data) as CompositeTransformResult<E>

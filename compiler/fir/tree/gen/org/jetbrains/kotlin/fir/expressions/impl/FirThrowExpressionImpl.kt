@@ -28,6 +28,12 @@ internal class FirThrowExpressionImpl(
 ) : FirThrowExpression() {
     override var typeRef: FirTypeRef = FirImplicitNothingTypeRef(source?.fakeElement(FirFakeSourceElementKind.ImplicitTypeRef))
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformThrowExpression(this, data) as R
+        else visitor.visitThrowExpression(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformThrowExpression(this, data) as CompositeTransformResult<E>

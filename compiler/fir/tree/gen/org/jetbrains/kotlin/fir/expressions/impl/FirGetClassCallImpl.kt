@@ -28,6 +28,12 @@ internal class FirGetClassCallImpl(
     override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
     override val argument: FirExpression get() = argumentList.arguments.first()
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformGetClassCall(this, data) as R
+        else visitor.visitGetClassCall(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformGetClassCall(this, data) as CompositeTransformResult<E>

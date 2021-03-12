@@ -25,6 +25,12 @@ internal class FirErrorNamedReferenceImpl(
 ) : FirErrorNamedReference() {
     override val name: Name = Name.special("<${diagnostic.reason}>")
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformErrorNamedReference(this, data) as R
+        else visitor.visitErrorNamedReference(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformErrorNamedReference(this, data) as CompositeTransformResult<E>

@@ -31,6 +31,12 @@ internal class FirErrorLoopImpl(
     override var block: FirBlock = FirEmptyExpressionBlock()
     override var condition: FirExpression = FirErrorExpressionImpl(source, ConeStubDiagnostic(diagnostic))
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformErrorLoop(this, data) as R
+        else visitor.visitErrorLoop(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformErrorLoop(this, data) as CompositeTransformResult<E>

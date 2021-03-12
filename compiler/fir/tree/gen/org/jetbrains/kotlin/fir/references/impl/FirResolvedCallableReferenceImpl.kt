@@ -28,6 +28,12 @@ internal class FirResolvedCallableReferenceImpl(
 ) : FirResolvedCallableReference() {
     override val candidateSymbol: AbstractFirBasedSymbol<*>? get() = null
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformResolvedCallableReference(this, data) as R
+        else visitor.visitResolvedCallableReference(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformResolvedCallableReference(this, data) as CompositeTransformResult<E>

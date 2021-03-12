@@ -24,6 +24,12 @@ class FirLazyExpression @FirImplementationDetail constructor(
     override val typeRef: FirTypeRef get() = error("FirLazyExpression should be calculated before accessing")
     override val annotations: List<FirAnnotationCall> get() = error("FirLazyExpression should be calculated before accessing")
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformExpression(this, data) as R
+        else visitor.visitExpression(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformExpression(this, data) as CompositeTransformResult<E>

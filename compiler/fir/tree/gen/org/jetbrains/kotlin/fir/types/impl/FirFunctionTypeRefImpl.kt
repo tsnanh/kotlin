@@ -27,6 +27,12 @@ internal class FirFunctionTypeRefImpl(
     override var returnTypeRef: FirTypeRef,
     override val isSuspend: Boolean,
 ) : FirFunctionTypeRef() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformFunctionTypeRef(this, data) as R
+        else visitor.visitFunctionTypeRef(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformFunctionTypeRef(this, data) as CompositeTransformResult<E>

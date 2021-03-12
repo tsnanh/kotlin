@@ -28,6 +28,12 @@ internal class FirComparisonExpressionImpl(
 ) : FirComparisonExpression() {
     override var typeRef: FirTypeRef = FirImplicitBooleanTypeRef(null)
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformComparisonExpression(this, data) as R
+        else visitor.visitComparisonExpression(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformComparisonExpression(this, data) as CompositeTransformResult<E>

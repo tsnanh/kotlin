@@ -25,6 +25,12 @@ class FirPropertyFromParameterResolvedNamedReference @FirImplementationDetail co
 ) : FirResolvedNamedReference() {
     override val candidateSymbol: AbstractFirBasedSymbol<*>? get() = null
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformResolvedNamedReference(this, data) as R
+        else visitor.visitResolvedNamedReference(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformResolvedNamedReference(this, data) as CompositeTransformResult<E>

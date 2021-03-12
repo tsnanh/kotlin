@@ -26,6 +26,12 @@ internal class FirWhileLoopImpl(
     override var condition: FirExpression,
     override var block: FirBlock,
 ) : FirWhileLoop() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformWhileLoop(this, data) as R
+        else visitor.visitWhileLoop(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformWhileLoop(this, data) as CompositeTransformResult<E>

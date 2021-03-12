@@ -31,6 +31,12 @@ internal class FirResolvedImportImpl(
     override val resolvedClassId: ClassId? get() = relativeClassName?.let { ClassId(packageFqName, it, false) }
     override val importedName: Name? get() = importedFqName?.shortName()
 
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformResolvedImport(this, data) as R
+        else visitor.visitResolvedImport(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformResolvedImport(this, data) as CompositeTransformResult<E>

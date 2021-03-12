@@ -25,6 +25,12 @@ internal class FirCheckedSafeCallSubjectImpl(
     override val annotations: MutableList<FirAnnotationCall>,
     override val originalReceiverRef: FirExpressionRef<FirExpression>,
 ) : FirCheckedSafeCallSubject() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformCheckedSafeCallSubject(this, data) as R
+        else visitor.visitCheckedSafeCallSubject(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformCheckedSafeCallSubject(this, data) as CompositeTransformResult<E>

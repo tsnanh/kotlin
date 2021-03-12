@@ -21,6 +21,12 @@ internal class FirExplicitSuperReference(
     override val labelName: String?,
     override var superTypeRef: FirTypeRef,
 ) : FirSuperReference() {
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
+        @Suppress("UNCHECKED_CAST")
+        return if (visitor is FirTransformer<D>) visitor.transformSuperReference(this, data) as R
+        else visitor.visitSuperReference(this, data)
+    }
+
     override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
         @Suppress("UNCHECKED_CAST")
         return visitor.transformSuperReference(this, data) as CompositeTransformResult<E>
