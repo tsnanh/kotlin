@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.references.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirImplementationDetail
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
@@ -23,6 +24,11 @@ class FirPropertyFromParameterResolvedNamedReference @FirImplementationDetail co
     override val resolvedSymbol: AbstractFirBasedSymbol<*>,
 ) : FirResolvedNamedReference() {
     override val candidateSymbol: AbstractFirBasedSymbol<*>? get() = null
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformResolvedNamedReference(this, data) as CompositeTransformResult<E>
+    }
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {}
 

@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.fir.declarations.impl
 
 import org.jetbrains.kotlin.contracts.description.EventOccurrencesRange
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirLabel
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSourceElement
@@ -49,6 +50,11 @@ internal class FirAnonymousFunctionImpl(
 
     init {
         symbol.bind(this)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformAnonymousFunction(this, data) as CompositeTransformResult<E>
     }
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

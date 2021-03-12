@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.fir.declarations.impl
 
 import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirImplementationDetail
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSourceElement
@@ -55,6 +56,11 @@ open class FirPropertyAccessorImpl @FirImplementationDetail constructor(
 
     init {
         symbol.bind(this)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformPropertyAccessor(this, data) as CompositeTransformResult<E>
     }
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

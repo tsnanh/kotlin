@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.declarations.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.declarations.FirDeclarationAttributes
@@ -56,6 +57,11 @@ internal class FirEnumEntryImpl(
     init {
         symbol.bind(this)
         delegateFieldSymbol?.bind(this)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformEnumEntry(this, data) as CompositeTransformResult<E>
     }
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

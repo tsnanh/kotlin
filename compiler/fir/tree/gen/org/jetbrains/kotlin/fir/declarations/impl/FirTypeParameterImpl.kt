@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.declarations.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.declarations.FirDeclarationAttributes
@@ -38,6 +39,11 @@ internal class FirTypeParameterImpl(
 ) : FirTypeParameter() {
     init {
         symbol.bind(this)
+    }
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformTypeParameter(this, data) as CompositeTransformResult<E>
     }
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

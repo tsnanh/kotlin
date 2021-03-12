@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.contracts.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.contracts.FirEffectDeclaration
 import org.jetbrains.kotlin.fir.contracts.FirResolvedContractDescription
@@ -21,6 +22,11 @@ internal class FirResolvedContractDescriptionImpl(
     override val effects: MutableList<FirEffectDeclaration>,
     override val unresolvedEffects: MutableList<FirStatement>,
 ) : FirResolvedContractDescription() {
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformResolvedContractDescription(this, data) as CompositeTransformResult<E>
+    }
+
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         effects.forEach { it.accept(visitor, data) }
         unresolvedEffects.forEach { it.accept(visitor, data) }

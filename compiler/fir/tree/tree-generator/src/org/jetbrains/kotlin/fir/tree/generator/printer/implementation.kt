@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.tree.generator.printer
 
+import org.jetbrains.kotlin.fir.tree.generator.context.AbstractFirTreeBuilder
 import org.jetbrains.kotlin.fir.tree.generator.model.*
 import org.jetbrains.kotlin.fir.tree.generator.pureAbstractElementType
 import org.jetbrains.kotlin.util.SmartPrinter
@@ -20,7 +21,11 @@ fun Implementation.generateCode(generationPath: File): GeneratedFile {
         printCopyright()
         println("package $packageName")
         println()
-        val imports = collectImports()
+        val imports = collectImports(
+            if (this@generateCode.kind != Implementation.Kind.Interface && this@generateCode.kind != Implementation.Kind.AbstractClass) {
+                listOf(AbstractFirTreeBuilder.baseFirElement.fullQualifiedName)
+            } else emptyList()
+        )
         imports.forEach { println("import $it") }
         if (imports.isNotEmpty()) {
             println()
@@ -37,9 +42,7 @@ fun SmartPrinter.printImplementation(implementation: Implementation) {
             is FieldWithDefault -> origin.transform()
 
             is FirField ->
-//                println("$name = ${name}${call()}transformSingle(transformer, data)")
                 println("$name = ${name}${call()}accept(transformer, data)${call()}single as ${element.type}${if (nullable) "?" else ""}")
-//                println("$name = ${name}${call()}let { transformer.transform${(element as Element).name}(it, data) }?.single as ${element.type}${if (nullable) "?" else ""}")
 
             is FieldList -> {
                 println("${name}.transformInplace(transformer, data)")
@@ -123,6 +126,15 @@ fun SmartPrinter.printImplementation(implementation: Implementation) {
 
             fun Field.acceptString(): String = "${name}${call()}accept(visitor, data)"
             if (!isInterface && !isAbstract) {
+
+                println("override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {")
+                withIndent {
+                    println("@Suppress(\"UNCHECKED_CAST\")")
+                    println("return visitor.transform${element.name}(this, data) as CompositeTransformResult<E>")
+                }
+                println("}")
+                println()
+
                 print("override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {")
 
                 if (element.allFirFields.isNotEmpty()) {

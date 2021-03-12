@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.expressions.impl
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirFakeSourceElementKind
 import org.jetbrains.kotlin.fir.FirImplementationDetail
 import org.jetbrains.kotlin.fir.FirSourceElement
@@ -25,6 +26,11 @@ class FirUnitExpression @FirImplementationDetail constructor(
     override val annotations: MutableList<FirAnnotationCall>,
 ) : FirExpression() {
     override var typeRef: FirTypeRef = FirImplicitUnitTypeRef(source?.fakeElement(FirFakeSourceElementKind.ImplicitTypeRef))
+
+    override fun <E : FirElement, D> transform(visitor: FirTransformer<D>, data: D): CompositeTransformResult<E> {
+        @Suppress("UNCHECKED_CAST")
+        return visitor.transformExpression(this, data) as CompositeTransformResult<E>
+    }
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         typeRef.accept(visitor, data)
