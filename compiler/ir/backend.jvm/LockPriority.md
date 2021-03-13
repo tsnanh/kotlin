@@ -8,6 +8,6 @@ never gets acquired by a thread that already holds one of the locks that come la
 1. Global `IrLock` instance. Used in `SymbolTable`, 
    `lazyVar` instances in `IrLazyDeclaration`, `Fir2IrLazyDeclaration` subclasses,
    `Fir2IrDeclarationStorage`.
-1. - `classWriterLock` used in `loadClassBytesByInternalName`.
+1. - lock in `ClassBuilderAndSourceFileList.asBytes`.
    - lock on `methodNode` in `InlineCodegen.cloneMethodNode`.
    - Locks protecting `InlineCache` maps.
