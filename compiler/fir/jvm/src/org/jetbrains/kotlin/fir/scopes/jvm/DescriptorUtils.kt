@@ -24,7 +24,10 @@ fun FirFunction<*>.computeJvmSignature(typeConversion: (FirTypeRef) -> ConeKotli
     if (this !is FirCallableMemberDeclaration<*>) return null
     val containingClass = containingClass() ?: return null
 
-    return SignatureBuildingComponents.signature(containingClass.classId, computeJvmDescriptor(typeConversion = typeConversion))
+    return SignatureBuildingComponents.signature(
+        containingClass.classId,
+        computeJvmDescriptor(null, true, typeConversion)
+    )
 }
 
 fun FirFunction<*>.computeJvmDescriptor(
@@ -54,6 +57,26 @@ fun FirFunction<*>.computeJvmDescriptor(
         } else {
             typeConversion(returnTypeRef)?.let(this::appendConeType)
         }
+    }
+}
+
+fun FirFunction<*>.computeJvmDescriptor(): String = buildString {
+    if (this@computeJvmDescriptor is FirSimpleFunction) {
+        append(name.asString())
+    } else {
+        append("<init>")
+    }
+
+    append("(")
+    for (parameter in valueParameters) {
+        parameter.returnTypeRef.coneTypeSafe<ConeKotlinType>() ?.let(this::appendConeType)
+    }
+    append(")")
+
+    if (this@computeJvmDescriptor !is FirSimpleFunction || returnTypeRef.isVoid()) {
+        append("V")
+    } else {
+        returnTypeRef.coneTypeSafe<ConeKotlinType>()?.let(this::appendConeType)
     }
 }
 

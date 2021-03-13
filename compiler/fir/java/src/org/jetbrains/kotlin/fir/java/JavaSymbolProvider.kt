@@ -138,7 +138,7 @@ class JavaSymbolProvider(
 
     override fun getClassLikeSymbolByFqName(classId: ClassId): FirRegularClassSymbol? {
         return try {
-            getFirJavaClass(classId)
+            getFirJavaClass(classId, null)
         } catch (e: ProcessCanceledException) {
             null
         }

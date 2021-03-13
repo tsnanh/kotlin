@@ -31,7 +31,7 @@ abstract class VirtualFileFinder : KotlinClassFinder {
 
     override fun findKotlinClassOrContent(classId: ClassId): KotlinClassFinder.Result? {
         val file = findVirtualFileWithHeader(classId) ?: return null
-        return KotlinBinaryClassCache.getKotlinBinaryClassOrClassFileContent(file)
+        return KotlinBinaryClassCache.getKotlinBinaryClassOrClassFileContent(file, null)
     }
 
     override fun findKotlinClassOrContent(javaClass: JavaClass): KotlinClassFinder.Result? {
@@ -43,7 +43,7 @@ abstract class VirtualFileFinder : KotlinClassFinder {
             file = file.parent!!.findChild(classFileName(javaClass) + ".class").sure { "Virtual file not found for $javaClass" }
         }
 
-        return KotlinBinaryClassCache.getKotlinBinaryClassOrClassFileContent(file)
+        return KotlinBinaryClassCache.getKotlinBinaryClassOrClassFileContent(file, null)
     }
 
     private fun classFileName(jClass: JavaClass): String {

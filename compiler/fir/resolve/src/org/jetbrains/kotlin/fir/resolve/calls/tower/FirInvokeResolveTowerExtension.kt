@@ -59,7 +59,7 @@ internal class FirInvokeResolveTowerExtension(
         enqueueBothInvokeReceiverTasks(
             info,
             invokeAction = { task, receiverInfo ->
-                task.runResolverForExpressionReceiver(receiverInfo, receiver)
+                task.runResolverForExpressionReceiver(receiverInfo, receiver, TowerGroup.EmptyRoot)
             },
             invokeExtensionAction = { task, receiverInfo ->
                 task.runResolverForNoReceiver(receiverInfo)

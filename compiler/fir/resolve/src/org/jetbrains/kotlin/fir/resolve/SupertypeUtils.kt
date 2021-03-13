@@ -34,11 +34,25 @@ fun lookupSuperTypes(
     lookupInterfaces: Boolean,
     deep: Boolean,
     useSiteSession: FirSession,
-    supertypeSupplier: SupertypeSupplier = SupertypeSupplier.Default,
-    substituteTypes: Boolean = false
+    substituteTypes: Boolean,
+    supertypeSupplier: SupertypeSupplier,
 ): List<ConeClassLikeType> {
     return mutableListOf<ConeClassLikeType>().also {
         klass.symbol.collectSuperTypes(it, mutableSetOf(), deep, lookupInterfaces, substituteTypes, useSiteSession, supertypeSupplier)
+    }
+}
+
+fun lookupSuperTypes(
+    klass: FirClass<*>,
+    lookupInterfaces: Boolean,
+    deep: Boolean,
+    useSiteSession: FirSession,
+    substituteTypes: Boolean
+): List<ConeClassLikeType> {
+    return mutableListOf<ConeClassLikeType>().also {
+        klass.symbol.collectSuperTypes(
+            it, mutableSetOf(), deep, lookupInterfaces, substituteTypes, useSiteSession, SupertypeSupplier.Default
+        )
     }
 }
 

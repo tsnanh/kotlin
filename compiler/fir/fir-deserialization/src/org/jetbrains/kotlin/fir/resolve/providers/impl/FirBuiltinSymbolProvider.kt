@@ -290,7 +290,7 @@ class FirBuiltinSymbolProvider(session: FirSession, val kotlinScopeProvider: Kot
         private val lookup = mutableMapOf<ClassId, FirRegularClassSymbol>()
 
         fun getClassLikeSymbolByFqName(classId: ClassId): FirRegularClassSymbol? =
-            findAndDeserializeClass(classId)
+            findAndDeserializeClass(classId, null)
 
         private fun findAndDeserializeClass(
             classId: ClassId,
@@ -318,7 +318,7 @@ class FirBuiltinSymbolProvider(session: FirSession, val kotlinScopeProvider: Kot
 
         fun getTopLevelFunctionSymbols(name: Name): List<FirNamedFunctionSymbol> {
             return packageProto.`package`.functionList.filter { nameResolver.getName(it.name) == name }.map {
-                memberDeserializer.loadFunction(it).symbol
+                memberDeserializer.loadFunction(it, null).symbol
             }
         }
     }

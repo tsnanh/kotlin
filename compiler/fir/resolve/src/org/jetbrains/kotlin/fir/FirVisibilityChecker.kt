@@ -170,7 +170,7 @@ abstract class FirVisibilityChecker : FirSessionComponent {
     private fun FirClass<*>.isSubClass(ownerId: ClassId, session: FirSession): Boolean {
         if (classId.isSame(ownerId)) return true
 
-        return lookupSuperTypes(this, lookupInterfaces = true, deep = true, session).any { superType ->
+        return lookupSuperTypes(this, lookupInterfaces = true, deep = true, session, substituteTypes = false).any { superType ->
             (superType as? ConeClassLikeType)?.fullyExpandedType(session)?.lookupTag?.classId?.isSame(ownerId) == true
         }
     }

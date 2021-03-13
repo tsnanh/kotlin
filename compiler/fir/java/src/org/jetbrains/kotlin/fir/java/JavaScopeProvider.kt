@@ -82,7 +82,9 @@ class JavaScopeProvider(
                 if (regularClass.isThereLoopInSupertypes(useSiteSession))
                     listOf(StandardClassIds.Any.toConeKotlinType(emptyArray(), isNullable = false))
                 else
-                    lookupSuperTypes(regularClass, lookupInterfaces = true, deep = false, useSiteSession = useSiteSession)
+                    lookupSuperTypes(
+                        regularClass, lookupInterfaces = true, deep = false, useSiteSession = useSiteSession, substituteTypes = false
+                    )
 
             val superTypeScopes = superTypes.mapNotNull {
                 it.scopeForSupertype(useSiteSession, scopeSession, subClass = regularClass, declaredScope, delegateFields = null)

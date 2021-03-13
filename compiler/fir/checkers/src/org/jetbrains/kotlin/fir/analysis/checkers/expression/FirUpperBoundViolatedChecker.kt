@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirTypeParameterSymbol
 import org.jetbrains.kotlin.fir.typeContext
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.types.AbstractTypeChecker
+import org.jetbrains.kotlin.types.AbstractTypeChecker.isSubtypeOf
 import org.jetbrains.kotlin.utils.addToStdlib.min
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
@@ -243,7 +244,7 @@ object FirUpperBoundViolatedChecker : FirQualifiedAccessChecker() {
         ).safeAs<ConeKotlinType>() ?: return true
 
         intersection = substitutor.substituteOrSelf(intersection)
-        return AbstractTypeChecker.isSubtypeOf(typeSystemContext, target, intersection, stubTypesEqualToAnything = false)
+        return isSubtypeOf(typeSystemContext.newBaseTypeCheckerContext(true, stubTypesEqualToAnything = false), target, intersection)
     }
 
     private fun DiagnosticReporter.reportOn(

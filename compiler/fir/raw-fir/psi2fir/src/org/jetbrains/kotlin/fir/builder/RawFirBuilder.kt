@@ -212,11 +212,19 @@ class RawFirBuilder(
 
         private fun KtExpression?.toFirExpression(
             errorReason: String,
-            kind: DiagnosticKind = DiagnosticKind.ExpressionRequired,
+            kind: DiagnosticKind
         ): FirExpression =
             if (stubMode) buildExpressionStub()
             else convertSafe() ?: buildErrorExpression(
                 this?.toFirSourceElement(), ConeSimpleDiagnostic(errorReason, kind),
+            )
+
+        private fun KtExpression?.toFirExpression(
+            errorReason: String
+        ): FirExpression =
+            if (stubMode) buildExpressionStub()
+            else convertSafe() ?: buildErrorExpression(
+                this?.toFirSourceElement(), ConeSimpleDiagnostic(errorReason, DiagnosticKind.ExpressionRequired),
             )
 
         private fun KtExpression.toFirStatement(errorReason: String): FirStatement =

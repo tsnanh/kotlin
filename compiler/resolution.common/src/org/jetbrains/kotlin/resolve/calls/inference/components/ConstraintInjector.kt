@@ -83,7 +83,7 @@ class ConstraintInjector(
         typeCheckerContext: TypeCheckerContext
     ) {
         typeCheckerContext.setConstrainingTypesToPrintDebugInfo(lowerType, upperType)
-        typeCheckerContext.runIsSubtypeOf(lowerType, upperType)
+        typeCheckerContext.runIsSubtypeOf(lowerType, upperType, false, false)
 
         processConstraints(c, typeCheckerContext)
     }

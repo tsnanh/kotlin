@@ -265,7 +265,8 @@ class FirMemberDeserializer(private val c: FirDeserializationContext) {
                         listOf(proto.setterValueParameter),
                         proto,
                         AbstractAnnotationDeserializer.CallableKind.PROPERTY_SETTER,
-                        classProto
+                        classProto,
+                        addDefaultValue = false
                     )
                 }.apply {
                     versionRequirementsTable = c.versionRequirementTable
@@ -378,7 +379,8 @@ class FirMemberDeserializer(private val c: FirDeserializationContext) {
                 proto.valueParameterList,
                 proto,
                 AbstractAnnotationDeserializer.CallableKind.OTHERS,
-                classProto
+                classProto,
+                addDefaultValue = false
             )
             annotations +=
                 c.annotationDeserializer.loadFunctionAnnotations(c.containerSource, proto, local.nameResolver, local.typeTable)

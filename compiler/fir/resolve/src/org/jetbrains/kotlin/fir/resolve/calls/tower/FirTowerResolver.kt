@@ -27,15 +27,15 @@ class FirTowerResolver(
     fun runResolver(
         info: CallInfo,
         context: ResolutionContext,
-        collector: CandidateCollector = this.collector,
-        manager: TowerResolveManager = this.manager
+        collector: CandidateCollector?,
+        manager: TowerResolveManager?
     ): CandidateCollector {
-        val candidateFactoriesAndCollectors = buildCandidateFactoriesAndCollectors(info, collector, context)
+        val candidateFactoriesAndCollectors = buildCandidateFactoriesAndCollectors(info, collector ?: this.collector, context)
 
-        enqueueResolutionTasks(context, manager, candidateFactoriesAndCollectors, info)
+        enqueueResolutionTasks(context, manager ?: this.manager, candidateFactoriesAndCollectors, info)
 
-        manager.runTasks()
-        return collector
+        (manager ?: this.manager).runTasks()
+        return collector ?: this.collector
     }
 
     private fun enqueueResolutionTasks(
@@ -73,7 +73,7 @@ class FirTowerResolver(
                     invokeResolveTowerExtension.enqueueResolveTasksForImplicitInvokeCall(info, receiver)
                     return
                 }
-                manager.enqueueResolverTask { mainTask.runResolverForExpressionReceiver(info, receiver) }
+                manager.enqueueResolverTask { mainTask.runResolverForExpressionReceiver(info, receiver, TowerGroup.EmptyRoot) }
                 invokeResolveTowerExtension.enqueueResolveTasksForExpressionReceiver(info, receiver)
             }
         }

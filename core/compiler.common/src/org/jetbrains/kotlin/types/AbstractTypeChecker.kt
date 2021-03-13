@@ -163,10 +163,9 @@ object AbstractTypeChecker {
     fun isSubtypeOf(
         context: TypeCheckerProviderContext,
         subType: KotlinTypeMarker,
-        superType: KotlinTypeMarker,
-        stubTypesEqualToAnything: Boolean = true
+        superType: KotlinTypeMarker
     ): Boolean {
-        return AbstractTypeChecker.isSubtypeOf(context.newBaseTypeCheckerContext(true, stubTypesEqualToAnything), subType, superType)
+        return isSubtypeOf(context.newBaseTypeCheckerContext(true, true), subType, superType)
     }
 
     fun isSubtypeOfClass(
@@ -197,8 +196,25 @@ object AbstractTypeChecker {
     fun isSubtypeOf(
         context: AbstractTypeCheckerContext,
         subType: KotlinTypeMarker,
+        superType: KotlinTypeMarker
+    ): Boolean {
+        if (subType === superType) return true
+
+        if (!context.customIsSubtypeOf(subType, superType)) return false
+
+        return completeIsSubTypeOf(
+            context,
+            context.typeSystemContext.prepareType(context.refineType(subType)),
+            context.typeSystemContext.prepareType(context.refineType(superType)),
+            false
+        )
+    }
+
+    fun isSubtypeOf(
+        context: AbstractTypeCheckerContext,
+        subType: KotlinTypeMarker,
         superType: KotlinTypeMarker,
-        isFromNullabilityConstraint: Boolean = false
+        isFromNullabilityConstraint: Boolean
     ): Boolean {
         if (subType === superType) return true
 

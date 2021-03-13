@@ -149,7 +149,7 @@ class FirCallResolver(
             transformer.components.containingDeclarations,
         )
         towerResolver.reset()
-        val result = towerResolver.runResolver(info, transformer.resolutionContext)
+        val result = towerResolver.runResolver(info, transformer.resolutionContext, null, null)
         val bestCandidates = result.bestCandidates()
         var reducedCandidates = if (!result.currentApplicability.isSuccess) {
             bestCandidates.toSet()
@@ -411,7 +411,8 @@ class FirCallResolver(
             ExplicitReceiverKind.NO_EXPLICIT_RECEIVER,
             scope = null
         )
-        val applicability = components.resolutionStageRunner.processCandidate(candidate, transformer.resolutionContext)
+        val applicability =
+            components.resolutionStageRunner.processCandidate(candidate, transformer.resolutionContext, stopOnFirstError = true)
         return ResolutionResult(callInfo, applicability, listOf(candidate))
     }
 

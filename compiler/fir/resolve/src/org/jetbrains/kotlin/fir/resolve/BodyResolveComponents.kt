@@ -239,7 +239,7 @@ fun SessionHolder.collectTowerDataElementsForClass(owner: FirClass<*>, defaultTy
     allImplicitCompanionValues.addIfNotNull(companionReceiver)
 
     val superClassesStaticsAndCompanionReceivers = mutableListOf<FirTowerDataElement>()
-    for (superType in lookupSuperTypes(owner, lookupInterfaces = false, deep = true, useSiteSession = session)) {
+    for (superType in lookupSuperTypes(owner, lookupInterfaces = false, deep = true, useSiteSession = session, substituteTypes = false)) {
         val expandedType = superType.fullyExpandedType(session)
         val superClass = expandedType.lookupTag.toSymbol(session)?.fir as? FirRegularClass ?: continue
 

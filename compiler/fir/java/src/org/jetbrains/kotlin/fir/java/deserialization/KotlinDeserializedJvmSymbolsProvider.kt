@@ -131,7 +131,7 @@ class KotlinDeserializedJvmSymbolsProvider(
         get() = classHeader.isPreRelease
 
     override fun getClassLikeSymbolByFqName(classId: ClassId): FirClassLikeSymbol<*>? {
-        return getClass(classId) ?: getTypeAlias(classId)
+        return getClass(classId, null) ?: getTypeAlias(classId)
     }
 
     private fun getTypeAlias(
@@ -159,7 +159,7 @@ class KotlinDeserializedJvmSymbolsProvider(
 
     private fun findAndDeserializeClassViaParent(classId: ClassId): FirRegularClassSymbol? {
         val outerClassId = classId.outerClassId ?: return null
-        getClass(outerClassId) ?: return null
+        getClass(outerClassId, null) ?: return null
         return classCache.getValueIfComputed(classId)
     }
 
@@ -229,7 +229,7 @@ class KotlinDeserializedJvmSymbolsProvider(
     private fun loadFunctionsByName(part: PackagePartsCacheData, name: Name): List<FirNamedFunctionSymbol> {
         val functionIds = part.topLevelFunctionNameIndex[name] ?: return emptyList()
         return functionIds.map {
-            part.context.memberDeserializer.loadFunction(part.proto.getFunction(it)).symbol
+            part.context.memberDeserializer.loadFunction(part.proto.getFunction(it), null).symbol
         }
     }
 

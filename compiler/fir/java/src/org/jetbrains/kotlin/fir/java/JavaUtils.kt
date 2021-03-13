@@ -120,7 +120,10 @@ internal fun JavaClassifierType.toFirResolvedTypeRef(
 ): FirResolvedTypeRef {
     val coneType =
         if (isForSupertypes)
-            toConeKotlinTypeForFlexibleBound(session, javaTypeParameterStack, isLowerBound = true, forTypeParameterBounds, isForSupertypes)
+            toConeKotlinTypeForFlexibleBound(
+                session, javaTypeParameterStack, isLowerBound = true, forTypeParameterBounds, isForSupertypes,
+                null, false, ConeAttributes.Empty
+            )
         else
             toConeKotlinTypeWithoutEnhancement(session, javaTypeParameterStack, forTypeParameterBounds, isForSupertypes)
 
@@ -242,6 +245,7 @@ private fun JavaClassifierType.toConeKotlinTypeWithoutEnhancement(
         isLowerBound = true,
         forTypeParameterBounds,
         isForSupertypes,
+        lowerBound = null,
         forAnnotationMember = forAnnotationMember,
         attributes = attributes
     )

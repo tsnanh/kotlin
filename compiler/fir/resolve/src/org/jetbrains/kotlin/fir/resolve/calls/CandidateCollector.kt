@@ -30,7 +30,7 @@ open class CandidateCollector(
     }
 
     open fun consumeCandidate(group: TowerGroup, candidate: Candidate, context: ResolutionContext): CandidateApplicability {
-        val applicability = resolutionStageRunner.processCandidate(candidate, context)
+        val applicability = resolutionStageRunner.processCandidate(candidate, context, stopOnFirstError = true)
 
         if (applicability > currentApplicability || (applicability == currentApplicability && group < bestGroup)) {
             candidates.clear()

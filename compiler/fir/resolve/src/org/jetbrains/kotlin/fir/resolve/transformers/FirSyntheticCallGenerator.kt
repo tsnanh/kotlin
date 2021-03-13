@@ -164,7 +164,7 @@ class FirSyntheticCallGenerator(
     ): FirNamedReferenceWithCandidate? {
         val callInfo = generateCallInfo(name, argumentList, callKind)
         val candidate = generateCandidate(callInfo, function, context)
-        val applicability = components.resolutionStageRunner.processCandidate(candidate, context)
+        val applicability = components.resolutionStageRunner.processCandidate(candidate, context, stopOnFirstError = true)
         if (applicability <= CandidateApplicability.INAPPLICABLE) {
             return null
         }
