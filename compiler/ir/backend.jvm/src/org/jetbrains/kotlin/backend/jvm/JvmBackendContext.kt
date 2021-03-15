@@ -130,6 +130,8 @@ class JvmBackendContext(
 
     internal val continuationClassesVarsCountByType: MutableMap<IrAttributeContainer, Map<Type, Int>> = hashMapOf()
 
+    val inlineMethodGenerationLock = Any()
+
     internal fun referenceClass(descriptor: ClassDescriptor): IrClassSymbol =
         symbolTable.lazyWrapper.referenceClass(descriptor)
 

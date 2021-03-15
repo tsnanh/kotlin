@@ -47,7 +47,6 @@ import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.org.objectweb.asm.*
 import org.jetbrains.org.objectweb.asm.commons.Method
-import org.jetbrains.org.objectweb.asm.tree.MethodNode
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
@@ -254,33 +253,6 @@ class ClassCodegen private constructor(
         return listOfNotNull(context.psiSourceManager.getFileEntry(this)?.let { File(it.name) })
     }
 
-    companion object {
-        fun getOrCreate(
-            irClass: IrClass,
-            context: JvmBackendContext,
-            // The `parentFunction` is only set for classes nested inside of functions. This is usually safe, since there is no
-            // way to refer to (inline) members of such a class from outside of the function unless the function in question is
-            // itself declared as inline. In that case, the function will be compiled before we can refer to the nested class.
-            //
-            // The one exception to this rule are anonymous objects defined as members of a class. These are nested inside of the
-            // class initializer, but can be referred to from anywhere within the scope of the class. That's why we have to ensure
-            // that all references to classes inside of <clinit> have a non-null `parentFunction`.
-            parentFunction: IrFunction? = irClass.parent.safeAs<IrFunction>()?.takeIf {
-                it.origin == JvmLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER
-            },
-        ): ClassCodegen =
-            context.classCodegens.getOrPut(irClass) { ClassCodegen(irClass, context, parentFunction) }.also {
-                assert(parentFunction == null || it.parentFunction == parentFunction) {
-                    "inconsistent parent function for ${irClass.render()}:\n" +
-                            "New: ${parentFunction!!.render()}\n" +
-                            "Old: ${it.parentFunction?.render()}"
-                }
-            }
-
-        private fun JvmClassSignature.hasInvalidName() =
-            name.splitToSequence('/').any { identifier -> identifier.any { it in JvmSimpleNameBacktickChecker.INVALID_CHARS } }
-    }
-
     private fun generateField(field: IrField) {
         val fieldType = typeMapper.mapType(field)
         val fieldSignature =
@@ -321,7 +293,6 @@ class ClassCodegen private constructor(
     }
 
     private val generatedInlineMethods = ConcurrentHashMap<IrFunction, SMAPAndMethodNode>()
-    private val lock = Any()
 
     fun generateMethodNode(method: IrFunction): SMAPAndMethodNode {
         if (!method.isInline && !method.isSuspendCapturingCrossinline()) {
@@ -335,7 +306,7 @@ class ClassCodegen private constructor(
 
         // Only allow generation of one inline method at a time, to avoid deadlocks when files call inline methods of each other.
         val (node, smap) =
-            generatedInlineMethods[method] ?: synchronized(lock) {
+            generatedInlineMethods[method] ?: synchronized(context.inlineMethodGenerationLock) {
                 generatedInlineMethods.getOrPut(method) { FunctionCodegen(method, this).generate() }
             }
         return SMAPAndMethodNode(cloneMethodNode(node), smap)
@@ -482,6 +453,33 @@ class ClassCodegen private constructor(
             else
                 OtherOrigin(psiElement, descriptor)
         }
+
+    companion object {
+        fun getOrCreate(
+            irClass: IrClass,
+            context: JvmBackendContext,
+            // The `parentFunction` is only set for classes nested inside of functions. This is usually safe, since there is no
+            // way to refer to (inline) members of such a class from outside of the function unless the function in question is
+            // itself declared as inline. In that case, the function will be compiled before we can refer to the nested class.
+            //
+            // The one exception to this rule are anonymous objects defined as members of a class. These are nested inside of the
+            // class initializer, but can be referred to from anywhere within the scope of the class. That's why we have to ensure
+            // that all references to classes inside of <clinit> have a non-null `parentFunction`.
+            parentFunction: IrFunction? = irClass.parent.safeAs<IrFunction>()?.takeIf {
+                it.origin == JvmLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER
+            },
+        ): ClassCodegen =
+            context.classCodegens.getOrPut(irClass) { ClassCodegen(irClass, context, parentFunction) }.also {
+                assert(parentFunction == null || it.parentFunction == parentFunction) {
+                    "inconsistent parent function for ${irClass.render()}:\n" +
+                            "New: ${parentFunction!!.render()}\n" +
+                            "Old: ${it.parentFunction?.render()}"
+                }
+            }
+
+        private fun JvmClassSignature.hasInvalidName() =
+            name.splitToSequence('/').any { identifier -> identifier.any { it in JvmSimpleNameBacktickChecker.INVALID_CHARS } }
+    }
 }
 
 private fun IrClass.getFlags(languageVersionSettings: LanguageVersionSettings): Int =
