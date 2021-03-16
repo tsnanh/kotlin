@@ -28,7 +28,7 @@ inline fun <reified T : IrElement> MutableList<T>.transformInPlace(transformatio
     }
 }
 
-inline fun <reified T : IrElement, D> MutableList<T>.transformInPlace(transformer: IrElementTransformer<D>, data: D) {
+fun <T : IrElement, D> MutableList<T>.transformInPlace(transformer: IrElementTransformer<D>, data: D) {
     for (i in 0 until size) {
         // Cast to IrElementBase to avoid casting to interface and invokeinterface, both of which are slow.
         @Suppress("UNCHECKED_CAST")
