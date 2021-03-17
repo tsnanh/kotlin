@@ -421,16 +421,20 @@ allprojects {
     val mirrorRepo: String? = findProperty("maven.repository.mirror")?.toString()
 
     repositories {
-        kotlinBuildLocalRepo(project)
-        mirrorRepo?.let(::maven)
-        jcenter()
-        maven(protobufRepo)
-        maven(intellijRepo)
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-dependencies")
-        maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
-        maven("https://dl.google.com/dl/android/maven2")
-        bootstrapKotlinRepo?.let(::maven)
         internalBootstrapRepo?.let(::maven)
+        bootstrapKotlinRepo?.let(::maven)
+        maven(protobufRepo)
+
+        maven(intellijRepo)
+        kotlinBuildLocalRepo(project)
+
+        mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-dependencies")
+        maven("https://dl.google.com/dl/android/maven2")
+        maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
+        mirrorRepo?.let(::maven)
+
+        jcenter()
     }
 
     configureJvmProject(javaHome!!, jvmTarget!!)
