@@ -614,6 +614,8 @@ open class IrBasedClassDescriptor(owner: IrClass) : ClassDescriptor, IrBasedDecl
         TODO("not implemented")
     }
 
+    override fun getInlineClassRepresentation(): InlineClassRepresentation<SimpleType>? = TODO("not implemented")
+
     override fun getOriginal() = this
 
     override fun isExpect() = false
@@ -737,6 +739,8 @@ open class IrBasedEnumEntryDescriptor(owner: IrEnumEntry) : ClassDescriptor, IrB
     override fun getSealedSubclasses(): Collection<ClassDescriptor> {
         TODO("not implemented")
     }
+
+    override fun getInlineClassRepresentation(): InlineClassRepresentation<SimpleType>? = TODO("not implemented")
 
     override fun getOriginal() = this
 
