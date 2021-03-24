@@ -5,10 +5,8 @@
 
 package org.jetbrains.kotlin.fir
 
-import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.cli.common.toBooleanLenient
-import org.jetbrains.kotlin.fir.scopes.ProcessorAction
 
 
 private val USE_BE_IR = System.getProperty("fir.bench.fe1.useIR", "false").toBooleanLenient()!!
@@ -19,14 +17,6 @@ class FE1FullPipelineModularizedTest : AbstractFullPipelineModularizedTest() {
         args.useFir = false
         args.jvmDefault = "compatibility"
         args.optIn = arrayOf("kotlin.RequiresOptIn")
-    }
-
-    override fun handleResult(result: ExitCode, moduleData: ModuleData, collector: TestMessageCollector): ProcessorAction {
-        return ProcessorAction.NEXT
-    }
-
-    override fun afterPass(pass: Int) {
-        createReport(finalReport = pass == PASSES - 1)
     }
 
     fun testTotalKotlin() {
