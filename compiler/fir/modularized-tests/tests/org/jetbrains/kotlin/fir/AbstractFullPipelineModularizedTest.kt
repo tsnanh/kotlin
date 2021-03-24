@@ -70,7 +70,7 @@ abstract class AbstractFullPipelineModularizedTest : AbstractModularizedTest() {
         require(okModules.isNotEmpty()) { "All of $totalModules is failed" }
     }
 
-    protected fun formatReportTable(stream: PrintStream, finalReport: Boolean) {
+    protected fun formatReportTable(stream: PrintStream) {
         val total = totalPassResult
         var totalGcTimeMs = 0L
         var totalGcCount = 0L
@@ -174,7 +174,7 @@ abstract class AbstractFullPipelineModularizedTest : AbstractModularizedTest() {
         stream.println("TOTAL MODULES: ${totalModules.size}")
         stream.println("OK MODULES: ${okModules.size}")
 
-        formatReportTable(stream, finalReport)
+        formatReportTable(stream)
 
         if (finalReport) {
             with(stream) {
