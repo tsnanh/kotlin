@@ -421,6 +421,9 @@ class MapTest {
             // returning false for values that aren't [MutableEntry] (including [SimpleEntry]).
             assertTrue(map.entries.contains(SimpleEntry(key, value)), mapDescription)
             assertTrue(map.entries.toSet().contains(SimpleEntry(key, value)), mapDescription)
+
+            assertFalse(map.entries.contains(null as Any?))
+            assertFalse(map.entries.contains("not any entry" as Any?))
         }
 
         val mapLetterToIndex = ('a'..'z').mapIndexed { i, c -> "$c" to i }.toMap()
@@ -434,6 +437,36 @@ class MapTest {
             doTest("MapBuilder", this, "z", 25)
         }
         doTest("built Map", builtMap, "y", 24)
+    }
+
+    @Test
+    fun entriesCovariantRemove() {
+        fun doTest(implName: String, map: MutableMap<String, Int>, key: String, value: Int) {
+            class SimpleEntry<out K, out V>(override val key: K, override val value: V) : Map.Entry<K, V> {
+                override fun toString(): String = "$key=$value"
+                override fun hashCode(): Int = key.hashCode() xor value.hashCode()
+                override fun equals(other: Any?): Boolean =
+                    other is Map.Entry<*, *> && key == other.key && value == other.value
+            }
+
+            val mapDescription = "$implName: ${map::class}"
+
+            assertTrue(map.entries.toMutableSet().remove(SimpleEntry(key, value) as Map.Entry<*, *>), mapDescription)
+            assertTrue(map.entries.remove(SimpleEntry(key, value) as Map.Entry<*, *>), mapDescription)
+
+            assertFalse(map.entries.remove(null as Any?))
+            assertFalse(map.entries.remove("not any entry" as Any?))
+        }
+
+        val mapLetterToIndex = ('a'..'z').mapIndexed { i, c -> "$c" to i }.toMap()
+        doTest("default mutable", mapLetterToIndex.toMutableMap(), "b", 1)
+        doTest("HashMap", mapLetterToIndex.toMap(HashMap()), "c", 2)
+        doTest("LinkedHashMap", mapLetterToIndex.toMap(LinkedHashMap()), "d", 3)
+
+        val builtMap = buildMap {
+            putAll(mapLetterToIndex)
+            doTest("MapBuilder", this, "z", 25)
+        }
     }
 
     @Test
