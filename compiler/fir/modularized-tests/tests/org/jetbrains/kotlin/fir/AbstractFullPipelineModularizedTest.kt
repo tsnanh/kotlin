@@ -20,8 +20,7 @@ import java.nio.file.Files
 
 abstract class AbstractFullPipelineModularizedTest : AbstractModularizedTest() {
 
-    data class ModuleStatus(val data: ModuleData) {
-        lateinit var targetInfo: String
+    data class ModuleStatus(val data: ModuleData, val targetInfo: String) {
         var compilationError: String? = null
         var jvmInternalError: String? = null
         var exceptionMessage: String = "NO MESSAGE"
@@ -130,8 +129,8 @@ abstract class AbstractFullPipelineModularizedTest : AbstractModularizedTest() {
 
     abstract fun configureArguments(args: K2JVMCompilerArguments, moduleData: ModuleData)
 
-    protected open fun handleResult(result: ExitCode, moduleData: ModuleData, collector: TestMessageCollector): ProcessorAction {
-        val status = ModuleStatus(moduleData)
+    protected open fun handleResult(result: ExitCode, moduleData: ModuleData, collector: TestMessageCollector, targetInfo: String): ProcessorAction {
+        val status = ModuleStatus(moduleData, targetInfo)
         totalModules += status
 
         return when (result) {
@@ -237,7 +236,7 @@ abstract class AbstractFullPipelineModularizedTest : AbstractModularizedTest() {
             totalPassResult += resultTime
         }
 
-        return handleResult(result, moduleData, collector)
+        return handleResult(result, moduleData, collector, manager.getTargetInfo())
     }
 
     protected fun createReport(finalReport: Boolean) {
