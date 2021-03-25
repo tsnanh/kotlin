@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir
 
+import com.intellij.util.io.delete
 import org.jetbrains.kotlin.cli.common.*
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
@@ -14,9 +15,11 @@ import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
 import org.jetbrains.kotlin.config.Services
 import org.jetbrains.kotlin.fir.scopes.ProcessorAction
+import org.jetbrains.kotlin.util.PerformanceCounter
 import java.io.FileOutputStream
 import java.io.PrintStream
 import java.nio.file.Files
+import java.nio.file.Path
 
 abstract class AbstractFullPipelineModularizedTest : AbstractModularizedTest() {
 
@@ -115,14 +118,13 @@ abstract class AbstractFullPipelineModularizedTest : AbstractModularizedTest() {
 
     }
 
-    private fun configureBaseArguments(args: K2JVMCompilerArguments, moduleData: ModuleData) {
+    private fun configureBaseArguments(args: K2JVMCompilerArguments, moduleData: ModuleData, tmp: Path) {
         args.reportPerf = true
         args.jvmTarget = "1.8"
         args.classpath = moduleData.classpath.joinToString(separator = ":") { it.absolutePath }
         args.javaSourceRoots = moduleData.javaSourceRoots.map { it.absolutePath }.toTypedArray()
         args.allowKotlinPackage = true
         args.freeArgs = moduleData.sources.map { it.absolutePath }
-        val tmp = Files.createTempDirectory("compile-output")
         args.destination = tmp.toAbsolutePath().toFile().toString()
         args.friendPaths = moduleData.friendDirs.map { it.canonicalPath }.toTypedArray()
     }
@@ -218,7 +220,8 @@ abstract class AbstractFullPipelineModularizedTest : AbstractModularizedTest() {
     override fun processModule(moduleData: ModuleData): ProcessorAction {
         val compiler = K2JVMCompiler()
         val args = compiler.createArguments()
-        configureBaseArguments(args, moduleData)
+        val tmp = Files.createTempDirectory("compile-output")
+        configureBaseArguments(args, moduleData, tmp)
         configureArguments(args, moduleData)
 
         val manager = CompilerPerformanceManager()
@@ -231,7 +234,9 @@ abstract class AbstractFullPipelineModularizedTest : AbstractModularizedTest() {
             ExitCode.INTERNAL_ERROR
         }
         val resultTime = manager.reportCumulativeTime()
+        PerformanceCounter.resetAllCounters()
 
+        tmp.delete(recursively = true)
         if (result == ExitCode.OK) {
             totalPassResult += resultTime
         }
