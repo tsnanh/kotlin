@@ -13,16 +13,15 @@ import org.jetbrains.kotlin.fir.resolve.symbolProvider
 import org.jetbrains.kotlin.idea.fir.low.level.api.api.FirModuleResolveState
 import org.jetbrains.kotlin.idea.fir.low.level.api.api.LowLevelFirApiFacadeForCompletion
 import org.jetbrains.kotlin.idea.fir.low.level.api.api.getFirFile
-import org.jetbrains.kotlin.idea.fir.low.level.api.api.getResolveState
 import org.jetbrains.kotlin.idea.frontend.api.InvalidWayOfUsingAnalysisSession
 import org.jetbrains.kotlin.idea.frontend.api.KtAnalysisSession
-import org.jetbrains.kotlin.idea.frontend.api.tokens.ReadActionConfinementValidityToken
-import org.jetbrains.kotlin.idea.frontend.api.tokens.ValidityToken
+import org.jetbrains.kotlin.idea.frontend.api.components.KtVisibilityChecker
 import org.jetbrains.kotlin.idea.frontend.api.fir.components.*
 import org.jetbrains.kotlin.idea.frontend.api.fir.symbols.KtFirSymbolProvider
 import org.jetbrains.kotlin.idea.frontend.api.fir.utils.EnclosingDeclarationContext
 import org.jetbrains.kotlin.idea.frontend.api.fir.utils.recordCompletionContext
 import org.jetbrains.kotlin.idea.frontend.api.fir.utils.threadLocal
+import org.jetbrains.kotlin.idea.frontend.api.tokens.ValidityToken
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 
@@ -56,6 +55,8 @@ private constructor(
         KtFirSymbolDeclarationOverridesProvider(this, token)
 
     override val referenceShortenerImpl = KtFirReferenceShortener(this, token, firResolveState)
+
+    override val visibilityCheckerImpl: KtVisibilityChecker = KtFirVisibilityChecker(this, token)
 
     override val expressionInfoProviderImpl = KtFirExpressionInfoProvider(this, token)
 
