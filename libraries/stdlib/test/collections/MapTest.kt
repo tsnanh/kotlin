@@ -420,10 +420,10 @@ class MapTest {
             // which [contains] method takes [MutableEntry], so the compiler may generate special bridge
             // returning false for values that aren't [MutableEntry] (including [SimpleEntry]).
             assertTrue(map.entries.contains(SimpleEntry(key, value)), mapDescription)
-            assertTrue(map.entries.toSet().contains(SimpleEntry(key, value)), mapDescription)
+            assertTrue(map.entries.toSet().contains(SimpleEntry(key, value)), "$mapDescription: reference")
 
-            assertFalse(map.entries.contains(null as Any?))
-            assertFalse(map.entries.contains("not any entry" as Any?))
+            assertFalse(map.entries.contains(null as Any?), "$mapDescription: remove null")
+            assertFalse(map.entries.contains("not an entry" as Any?), "$mapDescription: remove not an entry")
         }
 
         val mapLetterToIndex = ('a'..'z').mapIndexed { i, c -> "$c" to i }.toMap()
@@ -451,11 +451,11 @@ class MapTest {
 
             val mapDescription = "$implName: ${map::class}"
 
-            assertTrue(map.entries.toMutableSet().remove(SimpleEntry(key, value) as Map.Entry<*, *>), mapDescription)
+            assertTrue(map.entries.toMutableSet().remove(SimpleEntry(key, value) as Map.Entry<*, *>), "$mapDescription: reference")
             assertTrue(map.entries.remove(SimpleEntry(key, value) as Map.Entry<*, *>), mapDescription)
 
-            assertFalse(map.entries.remove(null as Any?))
-            assertFalse(map.entries.remove("not any entry" as Any?))
+            assertFalse(map.entries.remove(null as Any?), "$mapDescription: remove null")
+            assertFalse(map.entries.remove("not an entry" as Any?), "$mapDescription: remove not an entry")
         }
 
         val mapLetterToIndex = ('a'..'z').mapIndexed { i, c -> "$c" to i }.toMap()
