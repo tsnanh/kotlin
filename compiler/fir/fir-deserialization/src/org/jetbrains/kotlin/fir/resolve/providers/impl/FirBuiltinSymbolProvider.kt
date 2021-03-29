@@ -48,7 +48,6 @@ import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
 import java.io.InputStream
 
-//TODO make thread safe
 @ThreadSafeMutableState
 class FirBuiltinSymbolProvider(session: FirSession, val kotlinScopeProvider: KotlinScopeProvider) : FirSymbolProvider(session) {
     private val allPackageFragments = loadBuiltIns().groupBy { it.fqName }
