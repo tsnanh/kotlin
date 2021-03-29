@@ -9,8 +9,6 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.interpreter.builtins.evaluateIntrinsicAnnotation
 import org.jetbrains.kotlin.ir.interpreter.builtins.interpretBinaryFunction
@@ -59,7 +57,7 @@ class IrInterpreter private constructor(
     private val bodyMap: Map<IdSignature, IrBody>,
     private val environment: IrInterpreterEnvironment
 ) {
-    private val irBuiltIns: IrBuiltIns
+    val irBuiltIns: IrBuiltIns
         get() = environment.irBuiltIns
     private val callStack: CallStack
         get() = environment.callStack
@@ -657,7 +655,7 @@ class IrInterpreter private constructor(
             // after evaluation of finally, check that there are not unhandled exceptions left
             val checkUnhandledException = fun() {
                 callStack.pushState(possibleException)
-                callStack.dropFrameUntilTryCatch()
+                callStack.dropFramesUntilTryCatch()
             }
             callStack.addInstruction(CustomInstruction(checkUnhandledException))
         }
@@ -673,7 +671,7 @@ class IrInterpreter private constructor(
             is ExceptionState -> callStack.pushState(exception)
             else -> throw InterpreterError("${exception::class} cannot be used as exception state")
         }
-        callStack.dropFrameUntilTryCatch()
+        callStack.dropFramesUntilTryCatch()
     }
 
     private fun interpretStringConcatenation(expression: IrStringConcatenation) {
