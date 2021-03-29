@@ -49,7 +49,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
 import java.io.InputStream
 
 @ThreadSafeMutableState
-class FirBuiltinSymbolProvider(session: FirSession, val kotlinScopeProvider: KotlinScopeProvider) : FirSymbolProvider(session) {
+open class FirBuiltinSymbolProvider(session: FirSession, val kotlinScopeProvider: KotlinScopeProvider) : FirSymbolProvider(session) {
     private val allPackageFragments = loadBuiltIns().groupBy { it.fqName }
     private val syntheticFunctionalInterfaceCache = SyntheticFunctionalInterfaceCache(session, kotlinScopeProvider)
 
@@ -86,13 +86,17 @@ class FirBuiltinSymbolProvider(session: FirSession, val kotlinScopeProvider: Kot
 
     @FirSymbolProviderInternals
     override fun getTopLevelFunctionSymbolsTo(destination: MutableList<FirNamedFunctionSymbol>, packageFqName: FqName, name: Name) {
-        allPackageFragments[packageFqName]?.flatMapTo(destination) {
-            it.getTopLevelFunctionSymbols(name)
-        }
+        getTopLevelFunctionSymbolsToByPackageFragments(destination, packageFqName, name)
     }
 
     @FirSymbolProviderInternals
     override fun getTopLevelPropertySymbolsTo(destination: MutableList<FirPropertySymbol>, packageFqName: FqName, name: Name) {
+    }
+
+    protected fun getTopLevelFunctionSymbolsToByPackageFragments(destination: MutableList<FirNamedFunctionSymbol>, packageFqName: FqName, name: Name) {
+        allPackageFragments[packageFqName]?.flatMapTo(destination) {
+            it.getTopLevelFunctionSymbols(name)
+        }
     }
 
     private class BuiltInsPackageFragment(
