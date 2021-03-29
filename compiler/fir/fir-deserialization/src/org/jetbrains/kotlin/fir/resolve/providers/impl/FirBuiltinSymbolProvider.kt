@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.*
-import org.jetbrains.kotlin.fir.caches.createCacheWithPostCompute
 import org.jetbrains.kotlin.fir.caches.firCachesFactory
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.builder.buildRegularClass
@@ -47,7 +46,6 @@ import org.jetbrains.kotlin.serialization.deserialization.getName
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
-import org.jetbrains.kotlin.utils.addToStdlib.getOrPut
 import java.io.InputStream
 
 //TODO make thread safe
@@ -258,23 +256,11 @@ class FirBuiltinSymbolProvider(session: FirSession, val kotlinScopeProvider: Kot
         stream: InputStream, val fqName: FqName, val session: FirSession,
         val kotlinScopeProvider: KotlinScopeProvider,
     ) {
-        lateinit var version: BuiltInsBinaryVersion
 
-        val packageProto: ProtoBuf.PackageFragment = run {
+        private val binaryVersionAndPackageFragment = BinaryVersionAndPackageFragment.createFromStream(stream)
 
-            version = BuiltInsBinaryVersion.readFrom(stream)
-
-            if (!version.isCompatible()) {
-                // TODO: report a proper diagnostic
-                throw UnsupportedOperationException(
-                    "Kotlin built-in definition format version is not supported: " +
-                            "expected ${BuiltInsBinaryVersion.INSTANCE}, actual $version. " +
-                            "Please update Kotlin",
-                )
-            }
-
-            ProtoBuf.PackageFragment.parseFrom(stream, BuiltInSerializerProtocol.extensionRegistry)
-        }
+        val version: BuiltInsBinaryVersion get() = binaryVersionAndPackageFragment.version
+        val packageProto: ProtoBuf.PackageFragment get() = binaryVersionAndPackageFragment.packageFragment
 
         private val nameResolver = NameResolverImpl(packageProto.strings, packageProto.qualifiedNames)
 
@@ -324,6 +310,29 @@ class FirBuiltinSymbolProvider(session: FirSession, val kotlinScopeProvider: Kot
             return packageProto.`package`.functionList.filter { nameResolver.getName(it.name) == name }.map {
                 memberDeserializer.loadFunction(it).symbol
             }
+        }
+    }
+}
+
+private data class BinaryVersionAndPackageFragment(
+    val version: BuiltInsBinaryVersion,
+    val packageFragment: ProtoBuf.PackageFragment,
+) {
+    companion object {
+        fun createFromStream(stream: InputStream): BinaryVersionAndPackageFragment {
+            val version = BuiltInsBinaryVersion.readFrom(stream)
+
+            if (!version.isCompatible()) {
+                // TODO: report a proper diagnostic
+                throw UnsupportedOperationException(
+                    "Kotlin built-in definition format version is not supported: " +
+                            "expected ${BuiltInsBinaryVersion.INSTANCE}, actual $version. " +
+                            "Please update Kotlin",
+                )
+            }
+
+            val packageFragment = ProtoBuf.PackageFragment.parseFrom(stream, BuiltInSerializerProtocol.extensionRegistry)
+           return BinaryVersionAndPackageFragment(version, packageFragment)
         }
     }
 }
