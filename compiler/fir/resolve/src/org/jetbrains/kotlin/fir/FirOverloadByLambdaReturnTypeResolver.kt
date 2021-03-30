@@ -38,10 +38,12 @@ class FirOverloadByLambdaReturnTypeResolver(
         allCandidates: Collection<Candidate>,
         bestCandidates: Set<Candidate>
     ): Set<Candidate> where T : FirStatement, T : FirResolvable {
-        if (
-            bestCandidates.size <= 1 ||
-            !session.languageVersionSettings.supportsFeature(LanguageFeature.OverloadResolutionByLambdaReturnType)
-        ) return bestCandidates
+        // TODO: Add !session.languageVersionSettings.supportsFeature(LanguageFeature.OverloadResolutionByLambdaReturnType)
+        // once flatMap ambiguity issue is fixed.
+        // Currently, some of the modules are built with 1.3 API and language version where OverloadResolutionByLambdaReturnType and
+        // one of the `flatMap` is not available there since it has @SinceKotlin("1.4").
+        // But in FIR, we don't support @SinceKotlin properly
+        if (bestCandidates.size <= 1) return bestCandidates
 
         /*
          * Inference session may look into candidate of call, and for that it uses callee reference.
