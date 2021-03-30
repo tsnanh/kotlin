@@ -15,10 +15,7 @@ import org.jetbrains.kotlin.codegen.coroutines.INVOKE_SUSPEND_METHOD_NAME
 import org.jetbrains.kotlin.codegen.coroutines.SUSPEND_CALL_RESULT_NAME
 import org.jetbrains.kotlin.codegen.coroutines.SUSPEND_FUNCTION_COMPLETION_PARAMETER_NAME
 import org.jetbrains.kotlin.codegen.coroutines.SUSPEND_FUNCTION_CREATE_METHOD_NAME
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.ClassKind
-import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
-import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.builders.declarations.*
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
@@ -28,7 +25,6 @@ import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
-import org.jetbrains.kotlin.load.java.JvmAnnotationNames
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.JVM_INLINE_ANNOTATION_FQ_NAME
@@ -72,14 +68,17 @@ class JvmSymbols(
         fqName: FqName,
         classKind: ClassKind = ClassKind.CLASS,
         classModality: Modality = Modality.FINAL,
-        classIsInline: Boolean = false,
+        inlineClassRepresentation: InlineClassRepresentation<IrSimpleType>? = null,
         block: (IrClass) -> Unit = {}
     ): IrClassSymbol =
         irFactory.buildClass {
             name = fqName.shortName()
             kind = classKind
             modality = classModality
-            isInline = classIsInline
+            if (inlineClassRepresentation != null) {
+                isInline = true
+                this.inlineClassRepresentation = inlineClassRepresentation
+            }
         }.apply {
             parent = when (fqName.parent().asString()) {
                 "kotlin" -> kotlinPackage
@@ -246,7 +245,10 @@ class JvmSymbols(
         }
 
     private val resultClassStub: IrClassSymbol =
-        createClass(StandardNames.RESULT_FQ_NAME, classIsInline = true) { klass ->
+        createClass(
+            StandardNames.RESULT_FQ_NAME,
+            inlineClassRepresentation = InlineClassRepresentation(Name.identifier("value"), irBuiltIns.anyNType as IrSimpleType)
+        ) { klass ->
             klass.addTypeParameter("T", irBuiltIns.anyNType, Variance.OUT_VARIANCE)
             klass.addConstructor { isPrimary = true }.apply {
                 addValueParameter("value", irBuiltIns.anyNType)

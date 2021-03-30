@@ -27,6 +27,7 @@ internal fun PersistentIrGenerator.generateClass() {
                 kind,
                 visibility,
                 modality,
+                inlineClassRepresentation,
                 isCompanion,
                 isInner,
                 isData,
