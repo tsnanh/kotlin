@@ -10843,6 +10843,11 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
             runTest("compiler/testData/codegen/box/delegation/delegationAndInheritanceFromJava.kt");
         }
 
+        @TestMetadata("delegationDifferentModule.kt")
+        public void testDelegationDifferentModule() throws Exception {
+            runTest("compiler/testData/codegen/box/delegation/delegationDifferentModule.kt");
+        }
+
         @TestMetadata("delegationToMap.kt")
         public void testDelegationToMap() throws Exception {
             runTest("compiler/testData/codegen/box/delegation/delegationToMap.kt");
