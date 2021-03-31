@@ -13338,6 +13338,12 @@ public class VisualizerBlackBoxTestGenerated extends AbstractVisualizerBlackBoxT
         }
 
         @Test
+        @TestMetadata("delegationDifferentModule.kt")
+        public void testDelegationDifferentModule() throws Exception {
+            runTest("compiler/testData/codegen/box/delegation/delegationDifferentModule.kt");
+        }
+
+        @Test
         @TestMetadata("delegationToMap.kt")
         public void testDelegationToMap() throws Exception {
             runTest("compiler/testData/codegen/box/delegation/delegationToMap.kt");
@@ -21241,6 +21247,12 @@ public class VisualizerBlackBoxTestGenerated extends AbstractVisualizerBlackBoxT
         @TestMetadata("conflictingOverloadsForThrowableInheritors.kt")
         public void testConflictingOverloadsForThrowableInheritors() throws Exception {
             runTest("compiler/testData/codegen/box/javaInterop/conflictingOverloadsForThrowableInheritors.kt");
+        }
+
+        @Test
+        @TestMetadata("conflictingOverloadsForThrowableInheritors2.kt")
+        public void testConflictingOverloadsForThrowableInheritors2() throws Exception {
+            runTest("compiler/testData/codegen/box/javaInterop/conflictingOverloadsForThrowableInheritors2.kt");
         }
 
         @Test
@@ -39947,6 +39959,12 @@ public class VisualizerBlackBoxTestGenerated extends AbstractVisualizerBlackBoxT
         @TestMetadata("receiverOfIntersectionType.kt")
         public void testReceiverOfIntersectionType() throws Exception {
             runTest("compiler/testData/codegen/box/traits/receiverOfIntersectionType.kt");
+        }
+
+        @Test
+        @TestMetadata("sameNameMethodFromInterface.kt")
+        public void testSameNameMethodFromInterface() throws Exception {
+            runTest("compiler/testData/codegen/box/traits/sameNameMethodFromInterface.kt");
         }
 
         @Test
