@@ -6,34 +6,30 @@
 package kotlin.text
 
 import kotlin.native.concurrent.SharedImmutable
-import kotlin.native.internal.GCCritical
+import kotlin.native.internal.GCUnsafeCall
 
 /**
  * Returns the index within this string of the first occurrence of the specified character, starting from the specified offset.
  */
-@SymbolName("Kotlin_String_indexOfChar")
-@GCCritical
+@GCUnsafeCall("Kotlin_String_indexOfChar")
 internal actual external fun String.nativeIndexOf(ch: Char, fromIndex: Int): Int
 
 /**
  * Returns the index within this string of the first occurrence of the specified substring, starting from the specified offset.
  */
-@SymbolName("Kotlin_String_indexOfString")
-@GCCritical
+@GCUnsafeCall("Kotlin_String_indexOfString")
 internal actual external fun String.nativeIndexOf(str: String, fromIndex: Int): Int
 
 /**
  * Returns the index within this string of the last occurrence of the specified character.
  */
-@SymbolName("Kotlin_String_lastIndexOfChar")
-@GCCritical
+@GCUnsafeCall("Kotlin_String_lastIndexOfChar")
 internal actual external fun String.nativeLastIndexOf(ch: Char, fromIndex: Int): Int
 
 /**
  * Returns the index within this string of the last occurrence of the specified character, starting from the specified offset.
  */
-@SymbolName("Kotlin_String_lastIndexOfString")
-@GCCritical
+@GCUnsafeCall("Kotlin_String_lastIndexOfString")
 internal actual external fun String.nativeLastIndexOf(str: String, fromIndex: Int): Int
 
 /**
@@ -64,8 +60,7 @@ public actual fun String.replace(oldChar: Char, newChar: Char, ignoreCase: Boole
         replaceIgnoreCase(oldChar, newChar)
 }
 
-@SymbolName("Kotlin_String_replace")
-@GCCritical
+@GCUnsafeCall("Kotlin_String_replace")
 private external fun String.replace(oldChar: Char, newChar: Char): String
 
 @OptIn(ExperimentalStdlibApi::class)
@@ -187,8 +182,7 @@ public fun String.regionMatches(
 }
 
 // Bounds must be checked before calling this method
-@SymbolName("Kotlin_String_unsafeRangeEquals")
-@GCCritical
+@GCUnsafeCall("Kotlin_String_unsafeRangeEquals")
 private external fun String.unsafeRangeEquals(thisOffset: Int, other: String, otherOffset: Int, length: Int): Boolean
 
 // Bounds must be checked before calling this method
@@ -243,8 +237,7 @@ public actual fun String.lowercase(): String = lowercaseImpl()
  */
 public actual fun String.toCharArray(): CharArray = toCharArray(this, 0, length)
 
-@SymbolName("Kotlin_String_toCharArray")
-@GCCritical
+@GCUnsafeCall("Kotlin_String_toCharArray")
 private external fun toCharArray(string: String, start: Int, size: Int): CharArray
 
 /**
