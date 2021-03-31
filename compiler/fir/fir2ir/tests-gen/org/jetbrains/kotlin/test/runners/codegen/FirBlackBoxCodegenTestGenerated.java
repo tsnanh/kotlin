@@ -22114,6 +22114,12 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             }
 
             @Test
+            @TestMetadata("builtInsInherited.kt")
+            public void testBuiltInsInherited() throws Exception {
+                runTest("compiler/testData/codegen/box/jvm8/defaults/builtInsInherited.kt");
+            }
+
+            @Test
             @TestMetadata("callableReference.kt")
             public void testCallableReference() throws Exception {
                 runTest("compiler/testData/codegen/box/jvm8/defaults/callableReference.kt");

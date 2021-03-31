@@ -18557,6 +18557,11 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
                 runTest("compiler/testData/codegen/box/jvm8/defaults/bridgeWithJava.kt");
             }
 
+            @TestMetadata("builtInsInherited.kt")
+            public void testBuiltInsInherited() throws Exception {
+                runTest("compiler/testData/codegen/box/jvm8/defaults/builtInsInherited.kt");
+            }
+
             @TestMetadata("callableReference.kt")
             public void testCallableReference() throws Exception {
                 runTest("compiler/testData/codegen/box/jvm8/defaults/callableReference.kt");
@@ -19963,11 +19968,6 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
         public static class ProtectedInSuperClass extends AbstractLightAnalysisModeTest {
-            @TestMetadata("defaultArguments.kt")
-            public void ignoreDefaultArguments() throws Exception {
-                runTest("compiler/testData/codegen/box/jvmStatic/protectedInSuperClass/defaultArguments.kt");
-            }
-
             @TestMetadata("simpleFunction.kt")
             public void ignoreSimpleFunction() throws Exception {
                 runTest("compiler/testData/codegen/box/jvmStatic/protectedInSuperClass/simpleFunction.kt");
@@ -19984,6 +19984,11 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
 
             public void testAllFilesPresentInProtectedInSuperClass() throws Exception {
                 KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmStatic/protectedInSuperClass"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JVM, true);
+            }
+
+            @TestMetadata("defaultArguments.kt")
+            public void testDefaultArguments() throws Exception {
+                runTest("compiler/testData/codegen/box/jvmStatic/protectedInSuperClass/defaultArguments.kt");
             }
         }
     }
