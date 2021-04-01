@@ -19,12 +19,12 @@ class ModifiedUTF8Test {
         val string = ""
         val bytesExpected = byteArrayOf()
 
-        val bytesModifiedUTF8 = string.toByteArray(ModifiedUTF8)
+        val bytesModifiedUTF8 = ModifiedUTF8.encode(string)
         val bytesDataOutput = string.writeUTFStringViaDataOutput()
         assertArrayEquals(bytesExpected, bytesModifiedUTF8)
         assertArrayEquals(bytesDataOutput, bytesModifiedUTF8)
 
-        assertEquals(string, bytesModifiedUTF8.toString(ModifiedUTF8))
+        assertEquals(string, ModifiedUTF8.decode(bytesModifiedUTF8))
     }
 
     @Test
@@ -32,12 +32,12 @@ class ModifiedUTF8Test {
         val string = NULL_CHAR.toString()
         val bytesExpected = byteArrayOf(0b1100_0000.toByte(), 0b1000_0000.toByte())
 
-        val bytesModifiedUTF8 = string.toByteArray(ModifiedUTF8)
+        val bytesModifiedUTF8 = ModifiedUTF8.encode(string)
         val bytesDataOutput = string.writeUTFStringViaDataOutput()
         assertArrayEquals(bytesExpected, bytesModifiedUTF8)
         assertArrayEquals(bytesDataOutput, bytesModifiedUTF8)
 
-        assertEquals(string, bytesModifiedUTF8.toString(ModifiedUTF8))
+        assertEquals(string, ModifiedUTF8.decode(bytesModifiedUTF8))
     }
 
     @Test
@@ -46,7 +46,7 @@ class ModifiedUTF8Test {
             val string = ASCII_CHARS.shuffled().joinToString("")
             assertEquals(ASCII_CHARS.count(), string.length)
 
-            val bytesModifiedUTF8 = string.toByteArray(ModifiedUTF8)
+            val bytesModifiedUTF8 = ModifiedUTF8.encode(string)
             assertEquals(string.length, bytesModifiedUTF8.size)
 
             val bytesDataOutput = string.writeUTFStringViaDataOutput()
@@ -54,16 +54,16 @@ class ModifiedUTF8Test {
             assertArrayEquals(bytesDataOutput, bytesModifiedUTF8)
             assertArrayEquals(bytesTraditionalUTF8, bytesModifiedUTF8)
 
-            assertEquals(string, bytesModifiedUTF8.toString(ModifiedUTF8))
+            assertEquals(string, ModifiedUTF8.decode(bytesModifiedUTF8))
         }
     }
 
     @Test
     fun testMultiByteChars() {
-        assertEquals(2, TWO_BYTE_CHARS.first.toString().toByteArray(ModifiedUTF8).size)
-        assertEquals(2, TWO_BYTE_CHARS.last.toString().toByteArray(ModifiedUTF8).size)
-        assertEquals(3, THREE_BYTE_CHARS.first.toString().toByteArray(ModifiedUTF8).size)
-        assertEquals(3, THREE_BYTE_CHARS.last.toString().toByteArray(ModifiedUTF8).size)
+        assertEquals(2, ModifiedUTF8.encode(TWO_BYTE_CHARS.first.toString()).size)
+        assertEquals(2, ModifiedUTF8.encode(TWO_BYTE_CHARS.last.toString()).size)
+        assertEquals(3, ModifiedUTF8.encode(THREE_BYTE_CHARS.first.toString()).size)
+        assertEquals(3, ModifiedUTF8.encode(THREE_BYTE_CHARS.last.toString()).size)
     }
 
     @Test
@@ -79,13 +79,13 @@ class ModifiedUTF8Test {
 
             val string = chars.shuffled().joinToString("")
 
-            val bytesModifiedUTF8 = string.toByteArray(ModifiedUTF8)
+            val bytesModifiedUTF8 = ModifiedUTF8.encode(string)
             assertEquals(expectedByteCount, bytesModifiedUTF8.size)
 
             val bytesDataOutput = string.writeUTFStringViaDataOutput()
             assertArrayEquals(bytesDataOutput, bytesModifiedUTF8)
 
-            assertEquals(string, bytesModifiedUTF8.toString(ModifiedUTF8))
+            assertEquals(string, ModifiedUTF8.decode(bytesModifiedUTF8))
         }
     }
 

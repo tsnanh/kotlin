@@ -3,15 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package org.jetbrains.kotlin.library.encodings
 
 import java.io.DataOutput
-import java.nio.ByteBuffer
-import java.nio.CharBuffer
-import java.nio.charset.Charset
-import java.nio.charset.CharsetDecoder
-import java.nio.charset.CharsetEncoder
-import java.nio.charset.CoderResult
 
 /**
  * Modified UTF-8 encoding.
@@ -24,129 +20,152 @@ import java.nio.charset.CoderResult
  *
  * See also [DataOutput.writeUTF].
  */
-object ModifiedUTF8 : Charset("MODIFIED-UTF8", null) {
-    override fun contains(cs: Charset?) = false
-    override fun newEncoder(): CharsetEncoder = Encoder()
-    override fun newDecoder(): CharsetDecoder = Decoder()
+object ModifiedUTF8 {
 
-    private class Encoder : CharsetEncoder(ModifiedUTF8, AVG_BYTES_PER_CHAR, MAX_BYTES_PER_CHAR, DEFAULT_REPLACEMENT) {
-        override fun encodeLoop(src: CharBuffer, dst: ByteBuffer): CoderResult {
-            var mark = src.position()
-            try {
-                while (src.hasRemaining()) {
-                    val ch = src.get().toInt()
-                    when {
-                        ch != 0 && ch < 0x80 -> {
-                            // U+0001..U+007F -> 0xxxxxxx
-                            // 7 meaningful bits -> 1 byte
-                            if (!dst.hasRemaining()) return CoderResult.OVERFLOW
-                            dst += ch
-                        }
-                        ch < 0x0800 -> {
-                            // U+0000, U+0080..U+07FF -> 110xxxxx 10xxxxxx
-                            // 11 meaningful bits -> 2 bytes
-                            if (dst.remaining() < 2) return CoderResult.OVERFLOW
-                            dst += (ch ushr 6) or 0b1100_0000
-                            dst += (ch and 0b0011_1111) or 0b1000_0000
-                        }
-                        else -> {
-                            // U+0800..U+FFFF -> 1110xxxx 10xxxxxx 10xxxxxx
-                            // 16 meaningful bits -> 3 bytes
-                            if (dst.remaining() < 3) return CoderResult.OVERFLOW
-                            dst += (ch ushr 12) or 0b1110_0000
-                            dst += ((ch ushr 6) and 0b0011_1111) or 0b1000_0000
-                            dst += (ch and 0b0011_1111) or 0b1000_0000
-                        }
-                    }
-                    mark++
+    fun encode(string: String): ByteArray {
+        val stringLength = string.length
+        if (stringLength == 0) return EMPTY_BYTE_ARRAY
+
+        val buffer = allocateByteArray(string, stringLength)
+        var writtenBytes = 0
+
+        var index = 0
+        while (index < stringLength) {
+            val char = string.readCharAsInt(index++)
+            when {
+                char != 0 && char < 0x80 -> {
+                    // U+0001..U+007F -> 0xxxxxxx
+                    // 7 meaningful bits -> 1 byte
+                    buffer[writtenBytes++] = char
                 }
-                return CoderResult.UNDERFLOW
-            } finally {
-                src.position(mark) // set buffer position to the last processed character
+                char < 0x0800 -> {
+                    // U+0000, U+0080..U+07FF -> 110xxxxx 10xxxxxx
+                    // 11 meaningful bits -> 2 bytes
+                    buffer[writtenBytes++] = (char ushr 6) or 0b1100_0000
+                    buffer[writtenBytes++] = (char and 0b0011_1111) or 0b1000_0000
+                }
+                else -> {
+                    // U+0800..U+FFFF -> 1110xxxx 10xxxxxx 10xxxxxx
+                    // 16 meaningful bits -> 3 bytes
+                    buffer[writtenBytes++] = (char ushr 12) or 0b1110_0000
+                    buffer[writtenBytes++] = ((char ushr 6) and 0b0011_1111) or 0b1000_0000
+                    buffer[writtenBytes++] = (char and 0b0011_1111) or 0b1000_0000
+                }
             }
         }
 
-        override fun isLegalReplacement(replacement: ByteArray) = replacement.singleOrNull() == DEFAULT_REPLACEMENT_BYTE
-        override fun canEncode(c: Char) = true
-        override fun canEncode(cs: CharSequence?) = true
-
-        private operator fun ByteBuffer.plusAssign(value: Int) {
-            put(value.toByte())
-        }
-
-        companion object {
-            private const val AVG_BYTES_PER_CHAR = 1.1f
-            private const val MAX_BYTES_PER_CHAR = 3f
-            private const val DEFAULT_REPLACEMENT_BYTE = '?'.toByte() // though never used
-            private val DEFAULT_REPLACEMENT = byteArrayOf(DEFAULT_REPLACEMENT_BYTE)
-        }
+        return if (buffer.size == writtenBytes) buffer else buffer.copyOf(writtenBytes)
     }
 
-    private class Decoder : CharsetDecoder(ModifiedUTF8, AVG_CHARS_PER_BYTE, MAX_CHARS_PER_BYTE) {
-        override fun decodeLoop(src: ByteBuffer, dst: CharBuffer): CoderResult {
-            var mark = src.position()
-            val limit = src.limit()
-            try {
-                while (mark < limit) {
-                    val byte1 = src.get().toPositiveInt()
-                    when {
-                        byte1 != 0 && byte1 and 0b1000_0000 == 0 -> {
-                            // 0xxxxxxx -> U+0001..U+007F
-                            // 1 byte -> 7 meaningful bits
-                            if (!dst.hasRemaining()) return CoderResult.OVERFLOW
-                            dst += byte1
-                            mark++
+    private inline fun allocateByteArray(string: String, stringLength: Int): ByteArray {
+        val byteArraySize = if (stringLength < 32) {
+            // Assumption: The majority of String literals are quite short strings.
+            // We can calculate the exact amount of bytes the string will occupy.
+            // This would help to avoid one `ByteArray.copyOf(Int)` call.
+            var requiredBytes = 0
+
+            var index = 0
+            while (index < stringLength) {
+                requiredBytes += when (string[index++]) {
+                    in '\u0001'..'\u007f' -> 1
+                    '\u0000', in '\u0080'..'\u07ff' -> 2
+                    else -> 3
+                }
+            }
+
+            requiredBytes
+        } else {
+            // Fallback to the worst case estimation.
+            stringLength * 3
+        }
+
+        return ByteArray(byteArraySize)
+    }
+
+    fun decode(array: ByteArray): String {
+        val arraySize = array.size
+        if (arraySize == 0) return EMPTY_STRING
+
+        val buffer =
+            CharArray(arraySize) // Allocate for the worse case. Anyway String constructor will make a CharArray copy.
+        var charsWritten = 0
+
+        var index = 0
+        while (index < arraySize) {
+            val byte1 = array.readByteAsInt(index++)
+            buffer[charsWritten++] = when {
+                byte1 != 0 && byte1 and 0b1000_0000 == 0 -> {
+                    // 0xxxxxxx -> U+0001..U+007F
+                    // 1 byte -> 7 meaningful bits
+                    byte1
+                }
+                byte1 ushr 5 == 0b000_0110 -> {
+                    // 110xxxxx 10xxxxxx -> U+0080..U+07FF or U+0000
+                    // 2 bytes -> 11 meaningful bits
+                    if (index < arraySize) {
+                        val byte2 = array.readByteAsInt(index)
+                        if (isValidContinuation(byte2)) {
+                            index++
+                            ((byte1 and 0b0001_1111) shl 6) or (byte2 and 0b0011_1111)
+                        } else {
+                            // broken byte sequence
+                            REPLACEMENT_CHAR
                         }
-                        byte1 ushr 5 == 0b000_0110 -> {
-                            // 110xxxxx 10xxxxxx -> U+0080..U+07FF or U+0000
-                            // 2 bytes -> 11 meaningful bits
-                            if (limit - mark < 2) return CoderResult.UNDERFLOW
-                            if (!dst.hasRemaining()) return CoderResult.OVERFLOW
-                            val byte2 = src.get().toPositiveInt()
-                            if (!isValidContinuation(byte2)) return CoderResult.malformedForLength(1) // [byte1] is malformed input
-                            dst += ((byte1 and 0b0001_1111) shl 6) or (byte2 and 0b0011_1111)
-                            mark += 2
-                        }
-                        byte1 ushr 4 == 0b0000_1110 -> {
-                            // 1110xxxx 10xxxxxx 10xxxxxx -> U+0800..U+FFFF
-                            // 3 bytes -> 16 meaningful bits
-                            if (limit - mark < 3) return CoderResult.UNDERFLOW
-                            if (!dst.hasRemaining()) return CoderResult.OVERFLOW
-                            val byte2 = src.get().toPositiveInt()
-                            if (!isValidContinuation(byte2)) return CoderResult.malformedForLength(1) // [byte1] is malformed input
-                            val byte3 = src.get().toPositiveInt()
-                            if (!isValidContinuation(byte3)) return CoderResult.malformedForLength(2) // [byte1, byte2] is malformed input
-                            dst += ((byte1 and 0b0000_1111) shl 12) or ((byte2 and 0b0011_1111) shl 6) or (byte3 and 0b0011_1111)
-                            mark +=3
-                        }
-                        else -> {
-                            // unexpected bit pattern -> malformed
-                            return CoderResult.malformedForLength(1) // [byte1] is malformed input
-                        }
+                    } else {
+                        // unexpectedly interrupted byte sequence
+                        REPLACEMENT_CHAR
                     }
                 }
-
-                return CoderResult.UNDERFLOW
-            } finally {
-                src.position(mark) // set buffer position to the last processed character
+                byte1 ushr 4 == 0b0000_1110 -> {
+                    // 1110xxxx 10xxxxxx 10xxxxxx -> U+0800..U+FFFF
+                    // 3 bytes -> 16 meaningful bits
+                    if (index < arraySize + 1) {
+                        val byte2 = array.readByteAsInt(index)
+                        if (isValidContinuation(byte2)) {
+                            index++
+                            val byte3 = array.readByteAsInt(index)
+                            if (isValidContinuation(byte2)) {
+                                index++
+                                ((byte1 and 0b0000_1111) shl 12) or ((byte2 and 0b0011_1111) shl 6) or (byte3 and 0b0011_1111)
+                            } else {
+                                // broken byte sequence
+                                REPLACEMENT_CHAR
+                            }
+                        } else {
+                            // broken byte sequence
+                            REPLACEMENT_CHAR
+                        }
+                    } else {
+                        // unexpectedly interrupted byte sequence
+                        REPLACEMENT_CHAR
+                    }
+                }
+                else -> {
+                    // unexpected bit pattern -> malformed
+                    REPLACEMENT_CHAR
+                }
             }
         }
 
-        private fun isValidContinuation(continuation: Int) = continuation ushr 6 == 0b0000_0010
-
-        /**
-         * Converts [Byte] to [Int] filling in most significant 24 bits with zeroes. The original [Byte.toInt] function
-         * fills most significant bits with the sign bit of [Byte] value, which is undesired.
-         */
-        private fun Byte.toPositiveInt(): Int = toInt() and 0b1111_1111
-
-        private operator fun CharBuffer.plusAssign(value: Int) {
-            put(value.toChar())
-        }
-
-        companion object {
-            private const val AVG_CHARS_PER_BYTE = 1f
-            private const val MAX_CHARS_PER_BYTE = 1f
-        }
+        return if (buffer.size == charsWritten) String(buffer) else String(buffer, 0, charsWritten)
     }
+
+    private inline fun String.readCharAsInt(index: Int): Int = this[index].toInt()
+
+    private inline fun ByteArray.readByteAsInt(index: Int): Int = this[index].toInt() and 0b1111_1111
+
+    private inline operator fun ByteArray.set(index: Int, value: Int) {
+        this[index] = value.toByte()
+    }
+
+    private inline operator fun CharArray.set(index: Int, value: Int) {
+        this[index] = value.toChar()
+    }
+
+    private inline fun isValidContinuation(byteN: Int) = byteN ushr 6 == 0b0000_0010
+
+    private val EMPTY_BYTE_ARRAY = byteArrayOf()
+    private const val EMPTY_STRING = ""
+
+    private const val REPLACEMENT_CHAR = '?'.toInt()
 }

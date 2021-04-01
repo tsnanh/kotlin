@@ -150,7 +150,7 @@ class IrLibraryFileFromKlib(private val klib: IrLibrary, private val fileIndex: 
 }
 
 internal fun IrLibraryFile.deserializeString(index: Int): String =
-    String(string(index), ModifiedUTF8) // TODO: use traditional UTF8 for older KLIBs?
+    ModifiedUTF8.decode(string(index)) // TODO: use traditional UTF8 for older KLIBs?
 
 internal fun IrLibraryFile.deserializeFqName(fqn: List<Int>): String =
     fqn.joinToString(".", transform = ::deserializeString)

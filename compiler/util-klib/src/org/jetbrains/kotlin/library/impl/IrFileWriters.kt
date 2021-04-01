@@ -67,7 +67,7 @@ class IrMemoryStringWriter(private val data: List<String>) : IrMemoryWriter() {
     override fun writeData(dataOutput: DataOutput) {
         dataOutput.writeInt(data.size)
 
-        val transformedData = data.map { it.toByteArray(ModifiedUTF8) }
+        val transformedData = data.map(ModifiedUTF8::encode)
 
         transformedData.forEach { dataOutput.writeInt(it.size) }
         transformedData.forEach { dataOutput.write(it) }
