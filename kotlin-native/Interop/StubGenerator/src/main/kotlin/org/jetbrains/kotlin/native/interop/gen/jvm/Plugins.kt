@@ -12,19 +12,21 @@ import org.jetbrains.kotlin.native.interop.skia.*
 object Plugins {
     fun plugin(pluginName: String?): Plugin = when (pluginName) {
         "org.jetbrains.kotlin.native.cinterop.plugin.skia" -> SkiaPlugin()
-        else -> DefaultPlugin()
+        else -> DefaultPlugin
     }
 }
 
 interface Plugin {
     fun buildNativeIndex(library: NativeLibrary, verbose: Boolean): IndexerResult
     val managedTypePassing: ManagedTypePassing
+    val ManagedType.stringRepresentation: String
     fun stubsBuildingContext(stubIrContext: StubIrContext): StubsBuildingContext
 }
 
-class DefaultPlugin : Plugin {
+object DefaultPlugin : Plugin {
     override fun buildNativeIndex(library: NativeLibrary, verbose: Boolean): IndexerResult =
             buildNativeIndexImpl(library, verbose)
     override val managedTypePassing = ManagedTypePassing()
+    override val ManagedType.stringRepresentation get() = error("ManagedType requires non-default interop plugin")
     override fun stubsBuildingContext(stubIrContext: StubIrContext) = StubsBuildingContextImpl(stubIrContext)
 }

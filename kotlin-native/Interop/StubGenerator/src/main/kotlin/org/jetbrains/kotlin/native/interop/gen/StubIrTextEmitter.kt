@@ -489,10 +489,6 @@ class StubIrTextEmitter(
             "@CCall.ManagedTypeReturn"
         AnnotationStub.CCall.ManagedTypeParameter ->
             "@CCall.ManagedTypeParameter"
-        //AnnotationStub.CCall.SkiaStructValueReturn ->
-        //    "@CCall.SkiaStructValueReturn"
-        //AnnotationStub.CCall.SkiaStructValueParameter ->
-        //    "@CCall.SkiaStructValueParameter"
         AnnotationStub.CCall.CppClassConstructor ->
             "@CCall.CppClassConstructor"
         is AnnotationStub.CStruct ->

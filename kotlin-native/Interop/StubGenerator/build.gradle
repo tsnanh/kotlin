@@ -25,8 +25,6 @@ mainClassName = "org.jetbrains.kotlin.native.interop.gen.jvm.MainKt"
 
 dependencies {
     implementation project(":kotlin-native:Interop:Indexer")
-    //implementation project(":kotlin-native:Interop:Skia:StubIr")
-    //implementation project(":kotlin-native:Interop:Skia:Indexer")
     implementation project(":kotlin-native:utilities:basic-utils")
     api project(path: ":kotlin-native:endorsedLibraries:kotlinx.cli", configuration: "jvmRuntimeElements")
 

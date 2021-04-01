@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.native.interop.gen
 import org.jetbrains.kotlin.native.interop.gen.jvm.GenerationMode
 import org.jetbrains.kotlin.native.interop.gen.jvm.KotlinPlatform
 import org.jetbrains.kotlin.native.interop.indexer.*
-import org.jetbrains.kotlin.native.interop.skia.isSkiaSharedPointer
 
 internal class MacroConstantStubBuilder(
         override val context: StubsBuildingContext,
@@ -568,24 +567,7 @@ internal abstract class FunctionalStubBuilder(
     }
 
     protected fun buildFunctionAnnotations(func: FunctionDecl, stubName: String = func.name) = listOf(
-            // TODO: this should be managed by Skia plugin, not just C++ mode.
-            AnnotationStub.CCall.ManagedTypeReturn.takeIf {
-                func.returnType.let {
-                    it is ManagedType &&
-                    it.decl.isSkiaSharedPointer &&
-                    context.configuration.library.language == Language.CPP
-                }
-            },
-            /*
-            // TODO: this should be managed by Skia plugin, not just C++ mode.
-            AnnotationStub.CCall.SkiaStructValueReturn.takeIf {
-                func.returnType.let {
-                    it is ManagedType &&
-                    !it.decl.isSkiaSharedPointer &&
-                    context.configuration.library.language == Language.CPP
-                }
-            },
-            */
+            AnnotationStub.CCall.ManagedTypeReturn.takeIf { func.returnType is ManagedType },
             AnnotationStub.CCall.Symbol("${context.generateNextUniqueId("knifunptr_")}_${stubName}")
         ).filterNotNull()
 

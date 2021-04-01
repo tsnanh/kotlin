@@ -131,7 +131,6 @@ sourceSets {
             srcDir("../Skia/Indexer/src/main/kotlin")
         }
         kotlin{
-            //srcDir("../Skia/Indexer/src/main/kotlin")
             target {
 
             }

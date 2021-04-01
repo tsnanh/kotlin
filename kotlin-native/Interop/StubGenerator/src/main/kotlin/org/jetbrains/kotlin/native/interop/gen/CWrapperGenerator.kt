@@ -57,13 +57,15 @@ internal class CWrappersGenerator(private val context: StubIrContext) {
             *bindSymbolToFunction(symbolName, wrapperName).toTypedArray()
     )
 
+    private val Type.stringRepresentation get() = this.getStringRepresentation(context.plugin)
+
     fun generateCCalleeWrapper(function: FunctionDecl, symbolName: String): CCalleeWrapper =
             if (function.isVararg) {
                 CCalleeWrapper(bindSymbolToFunction(symbolName, function.name))
             } else {
                 val wrapperName = generateFunctionWrapperName(function.name)
 
-                val returnType = function.returnType.getStringRepresentation()
+                val returnType = function.returnType.stringRepresentation
                 val unwrappedReturnType = function.returnType.unwrapTypedefs()
                 val returnTypePrefix =
                     if (unwrappedReturnType is PointerType && unwrappedReturnType.isLVReference) "&" else ""
@@ -73,12 +75,12 @@ internal class CWrappersGenerator(private val context: StubIrContext) {
                     else ""
 
                 val signatureParameters = function.parameters.mapIndexed { index, parameter ->
-                    val type = parameter.type.getStringRepresentation()
+                    val type = parameter.type.stringRepresentation
                     Parameter(type, "p$index")
                 }
                 val bodyParameters = function.parameters.mapIndexed { index, parameter ->
 
-                    val parameterTypeText = parameter.type.getStringRepresentation()
+                    val parameterTypeText = parameter.type.stringRepresentation
                     val type = parameter.type
                     val unwrappedType = type.unwrapTypedefs()
 
@@ -141,7 +143,7 @@ internal class CWrappersGenerator(private val context: StubIrContext) {
 
     fun generateCGlobalGetter(globalDecl: GlobalDecl, symbolName: String): CCalleeWrapper {
         val wrapperName = generateFunctionWrapperName("${globalDecl.name}_getter")
-        val returnType = globalDecl.type.getStringRepresentation()
+        val returnType = globalDecl.type.stringRepresentation
         val wrapperBody = "return ${globalDecl.name};"
         val wrapper = createWrapper(symbolName, wrapperName, returnType, emptyList(), wrapperBody)
         return CCalleeWrapper(wrapper)
@@ -157,7 +159,7 @@ internal class CWrappersGenerator(private val context: StubIrContext) {
 
     fun generateCGlobalSetter(globalDecl: GlobalDecl, symbolName: String): CCalleeWrapper {
         val wrapperName = generateFunctionWrapperName("${globalDecl.name}_setter")
-        val globalType = globalDecl.type.getStringRepresentation()
+        val globalType = globalDecl.type.stringRepresentation
         val parameter = Parameter(globalType, "p1")
         val wrapperBody = "${globalDecl.name} = ${parameter.name};"
         val wrapper = createWrapper(symbolName, wrapperName, "void", listOf(parameter), wrapperBody)

@@ -43,12 +43,9 @@ class SkiaNativeIndexImpl(library: NativeLibrary, verbose: Boolean) : NativeInde
         return ret
     }
 
-
-    // TODO: This should be managed by Skia plugin.
     private val wellKnownSkiaStructs: List<String>
             = listOf("SkImage", "SkSurface", "SkData", "GrDirectContext", "SkColorSpace", "SkPicture")
 
-    // TODO: This should be managed by Skia plugin.
     override fun String.isUnknownTemplate() =
             this.startsWith("sk_sp") &&
                     wellKnownSkiaStructs.none { this == "sk_sp<$it>" }

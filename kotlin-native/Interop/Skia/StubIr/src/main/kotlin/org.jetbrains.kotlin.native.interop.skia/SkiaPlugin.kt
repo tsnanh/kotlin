@@ -7,10 +7,12 @@ package org.jetbrains.kotlin.native.interop.skia
 
 import org.jetbrains.kotlin.native.interop.gen.ManagedTypePassing
 import org.jetbrains.kotlin.native.interop.gen.StubIrContext
+import org.jetbrains.kotlin.native.interop.gen.getStringRepresentation
 import org.jetbrains.kotlin.native.interop.gen.jvm.Plugin
 import org.jetbrains.kotlin.native.interop.indexer.IndexerResult
 import org.jetbrains.kotlin.native.interop.indexer.ManagedType
 import org.jetbrains.kotlin.native.interop.indexer.NativeLibrary
+import org.jetbrains.kotlin.native.interop.indexer.Type
 
 class SkiaPlugin : Plugin {
     override fun buildNativeIndex(library: NativeLibrary, verbose: Boolean): IndexerResult =
@@ -19,6 +21,11 @@ class SkiaPlugin : Plugin {
     override val managedTypePassing = object : ManagedTypePassing() {
         override val ManagedType.passValue: String get() = "sk_ref_sp<${this.decl.stripSkiaSharedPointer}>"
         override val ManagedType.returnValue: String get() = ".release()"
+    }
+
+    override val ManagedType.stringRepresentation: String get() {
+        assert(this.decl.isSkiaSharedPointer)
+        return "${this.decl.stripSkiaSharedPointer}*"
     }
     override fun stubsBuildingContext(stubIrContext: StubIrContext) = SkiaStubsBuildingContextImpl(stubIrContext)
 }

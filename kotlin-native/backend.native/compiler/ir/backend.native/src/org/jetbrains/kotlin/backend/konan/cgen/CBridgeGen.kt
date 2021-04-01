@@ -461,7 +461,7 @@ private fun CCallbackBuilder.addParameter(it: IrValueParameter, functionParamete
             retained = it.isObjCConsumed(),
             variadic = false,
             location = location,
-            managedTypeAnnotation = it.hasCCallAnnotation("ManagedTypeParameter") //|| it.hasCCallAnnotation("SkiaStructValueParameter")
+            managedTypeAnnotation = it.hasCCallAnnotation("ManagedTypeParameter")
     )
 
     val kotlinArgument = with(valuePassing) { receiveValue() }
@@ -473,7 +473,7 @@ private fun CCallbackBuilder.build(function: IrSimpleFunction, signature: IrSimp
             signature.returnType,
             location = if (isObjCMethod) function else location,
             signature = signature,
-            managedTypeAnnotation = function.hasCCallAnnotation("ManagedTypeReturn") //|| function.hasCCallAnnotation("SkiaStructValueReturn")
+            managedTypeAnnotation = function.hasCCallAnnotation("ManagedTypeReturn")
     )
     buildValueReturn(function, valueReturning)
     return buildCFunction()
@@ -609,16 +609,6 @@ private fun KotlinStubs.createFakeKotlinExternalFunction(
 
 private fun getCStructType(kotlinClass: IrClass): CType? =
         kotlinClass.getCStructSpelling()?.let { CTypes.simple(it) }
-
-/*
-// TODO: Skia plugin.
-private fun KotlinStubs.getNamedCSkiaSharedPointerToStructType(kotlinClass: IrClass): CType? {
-    val cStructType = kotlinClass.getCStructSpelling()?.let { CTypes.simple("sk_sp<$it>") } ?: return null
-    val name = getUniqueCName("struct")
-    addC(listOf("typedef ${cStructType.render(name)};"))
-    return CTypes.simple(name)
-}
-*/
 
 private fun KotlinStubs.getNamedCStructType(kotlinClass: IrClass): CType? {
     val cStructType = getCStructType(kotlinClass) ?: return null
