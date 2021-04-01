@@ -43,20 +43,23 @@ class SkiaNativeIndexImpl(library: NativeLibrary, verbose: Boolean) : NativeInde
         return ret
     }
 
-    private val wellKnownSkiaStructs: List<String>
-            = listOf("SkImage", "SkSurface", "SkData", "GrDirectContext", "SkColorSpace", "SkPicture")
-
     override fun String.isUnknownTemplate() =
-            this.startsWith("sk_sp") &&
-                    wellKnownSkiaStructs.none { this == "sk_sp<$it>" }
-
-
+            this.isCppTemplate && !this.isSkiaSharedPointer
 }
 
 val StructDecl.isSkiaSharedPointer: Boolean
-    get() = spelling.startsWith("sk_sp<") && spelling.endsWith(">")
+    get() = spelling.isSkiaSharedPointer
 
 val StructDecl.stripSkiaSharedPointer: String
-    get() = this.spelling.drop(6).dropLast(1).let {
-        if (it.startsWith("const ")) it.drop(6) else it
+    get() {
+        assert(this.isSkiaSharedPointer)
+        return this.spelling.drop(6).dropLast(1).let { // TODO: this is a hack.
+            if (it.startsWith("const ")) it.drop(6) else it
+        }
     }
+
+private val String.isCppTemplate: Boolean
+    get() = this.contains("<") && this.endsWith(">") // TODO: this is a hack.
+
+private val String.isSkiaSharedPointer: Boolean
+    get() = this.startsWith("sk_sp<") && this.endsWith(">") // TODO: this is a hack.
