@@ -8,6 +8,11 @@ import org.jetbrains.kotlin.native.interop.indexer.*
 
 internal data class CCalleeWrapper(val lines: List<String>)
 
+open class ManagedTypePassing {
+    open val ManagedType.passValue: String get() = error("ManagedType support requires a plugin")
+    open val ManagedType.returnValue: String get() = error("ManagedType support requires a plugin")
+}
+
 /**
  * Some functions don't have an address (e.g. macros-based or builtins).
  * To solve this problem we generate a wrapper function.
@@ -63,7 +68,9 @@ internal class CWrappersGenerator(private val context: StubIrContext) {
                 val returnTypePrefix =
                     if (unwrappedReturnType is PointerType && unwrappedReturnType.isLVReference) "&" else ""
                 val returnTypePostfix =
-                    if (unwrappedReturnType is ManagedType) ".release()" else ""
+                    if (unwrappedReturnType is ManagedType)
+                        with(context.plugin.managedTypePassing) { unwrappedReturnType.returnValue }
+                    else ""
 
                 val signatureParameters = function.parameters.mapIndexed { index, parameter ->
                     val type = parameter.type.getStringRepresentation()
@@ -88,7 +95,7 @@ internal class CWrappersGenerator(private val context: StubIrContext) {
                             unwrappedType is RecordType ->
                                 "*(${unwrappedType.decl.spelling}*)"
                             unwrappedType is ManagedType -> {
-                                "sk_ref_sp<${unwrappedType.decl.stripSkiaSharedPointer}>"
+                                with(context.plugin.managedTypePassing) { unwrappedType.passValue }
                         }
                         else ->
                                 "$cppRefTypePrefix($parameterTypeText)"

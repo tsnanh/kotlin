@@ -1,0 +1,27 @@
+/*
+ * Copyright 2010-2021 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
+ */
+
+buildscript {
+    apply from: "$rootDir/kotlin-native/gradle/kotlinGradlePlugin.gradle"
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'application'
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ['-Xopt-in=kotlin.ExperimentalUnsignedTypes', '-Xskip-metadata-version-check']
+        allWarningsAsErrors=true
+    }
+}
+
+dependencies {
+    implementation project(":kotlin-native:Interop:Indexer")
+}
+
+sourceSets{
+    main {
+    }
+}

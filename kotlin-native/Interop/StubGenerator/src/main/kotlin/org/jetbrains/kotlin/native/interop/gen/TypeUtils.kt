@@ -17,6 +17,8 @@
 package org.jetbrains.kotlin.native.interop.gen
 
 import org.jetbrains.kotlin.native.interop.indexer.*
+import org.jetbrains.kotlin.native.interop.skia.isSkiaSharedPointer
+import org.jetbrains.kotlin.native.interop.skia.stripSkiaSharedPointer
 
 val EnumDef.isAnonymous: Boolean
     get() = spelling.contains("(anonymous ") // TODO: it is a hack

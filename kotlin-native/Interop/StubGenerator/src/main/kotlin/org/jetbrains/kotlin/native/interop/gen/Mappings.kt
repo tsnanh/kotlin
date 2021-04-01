@@ -26,7 +26,6 @@ interface DeclarationMapper {
 
     val useUnsignedTypes: Boolean
 
-    // TODO: Skia
     fun getKotlinClassForManaged(structDecl: StructDecl): Classifier
 }
 
