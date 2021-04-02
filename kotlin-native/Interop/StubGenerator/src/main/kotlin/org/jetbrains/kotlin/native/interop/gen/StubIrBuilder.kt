@@ -245,14 +245,7 @@ open class StubsBuildingContextImpl(
         val classifier = declarationMapper.getKotlinClassForPointed(structDecl)
         return classifier
     }
-/*
-    // TODO: what should we really do to be able to get Foo from sk_sp<Foo>?
-    fun tryFindingStructByName(name: String): StructDecl {
-        return nativeIndex.structs.singleOrNull {
-            it.spelling == name && it.def != null
-        } ?: error("Finding template arg struct by name has found multiple candidates")
-    }
-*/
+
     open inner class DeclarationMapperImpl : DeclarationMapper {
         override fun getKotlinClassForPointed(structDecl: StructDecl): Classifier {
             val baseName = structDecl.kotlinName
@@ -267,10 +260,8 @@ open class StubsBuildingContextImpl(
             return Classifier.topLevel(pkg, baseName)
         }
 
-        override fun getKotlinClassForManaged(structDecl: StructDecl): Classifier {
-            println("ERROR 1")
-            error("ManagedType requires a plugin")
-        }
+        override fun getKotlinClassForManaged(structDecl: StructDecl): Classifier =
+                error("ManagedType requires a plugin")
 
         override fun isMappedToStrict(enumDef: EnumDef): Boolean = isStrictEnum(enumDef)
 

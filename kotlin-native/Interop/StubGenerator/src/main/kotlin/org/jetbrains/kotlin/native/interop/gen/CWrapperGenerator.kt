@@ -112,7 +112,7 @@ internal class CWrappersGenerator(private val context: StubIrContext) {
                     when  {
                         isCxxInstanceMethod -> {
                             val parametersPart = bodyParameters.drop(1).joinToString {
-                                "${it.type}${it.name}"
+                                "${it.type}(${it.name})"
                             }
                             "(${bodyParameters[0].name})->${name}($parametersPart)"
                         }

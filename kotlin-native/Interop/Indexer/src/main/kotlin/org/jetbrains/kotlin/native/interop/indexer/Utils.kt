@@ -127,7 +127,6 @@ internal fun parseTranslationUnit(
         options: Int
 ): CXTranslationUnit {
 
-    println("COMPILER: ${sourceFile.absolutePath} ${compilerArgs.joinToString(" ")}" )
     memScoped {
         val resultVar = alloc<CXTranslationUnitVar>()
 
