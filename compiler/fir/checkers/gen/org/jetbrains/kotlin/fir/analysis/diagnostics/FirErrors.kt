@@ -191,6 +191,9 @@ object FirErrors {
     // Ambiguity
     val OVERLOAD_RESOLUTION_AMBIGUITY by error1<FirSourceElement, PsiElement, Collection<AbstractFirBasedSymbol<*>>>(SourceElementPositioningStrategies.REFERENCE_BY_QUALIFIED)
     val ASSIGN_OPERATOR_AMBIGUITY by error1<FirSourceElement, PsiElement, Collection<AbstractFirBasedSymbol<*>>>()
+    val ITERATOR_AMBIGUITY by error1<FirSourceElement, PsiElement, Collection<AbstractFirBasedSymbol<*>>>(SourceElementPositioningStrategies.REFERENCE_BY_QUALIFIED)
+    val HAS_NEXT_FUNCTION_AMBIGUITY by error1<FirSourceElement, PsiElement, Collection<AbstractFirBasedSymbol<*>>>(SourceElementPositioningStrategies.REFERENCE_BY_QUALIFIED)
+    val NEXT_AMBIGUITY by error1<FirSourceElement, PsiElement, Collection<AbstractFirBasedSymbol<*>>>(SourceElementPositioningStrategies.REFERENCE_BY_QUALIFIED)
 
     // Types & type parameters
     val TYPE_MISMATCH by error2<FirSourceElement, PsiElement, ConeKotlinType, ConeKotlinType>()
@@ -331,6 +334,7 @@ object FirErrors {
     // Conventions
     val NO_GET_METHOD by error0<FirSourceElement, KtArrayAccessExpression>(SourceElementPositioningStrategies.ARRAY_ACCESS)
     val NO_SET_METHOD by error0<FirSourceElement, KtArrayAccessExpression>(SourceElementPositioningStrategies.ARRAY_ACCESS)
+    val ITERATOR_MISSING by error0<FirSourceElement, KtExpression>()
 
     // Type alias
     val TOPLEVEL_TYPEALIASES_ONLY by error0<FirSourceElement, KtTypeAlias>()

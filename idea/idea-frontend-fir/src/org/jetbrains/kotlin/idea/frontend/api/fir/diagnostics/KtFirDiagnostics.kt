@@ -533,6 +533,21 @@ sealed class KtFirDiagnostic<PSI: PsiElement> : KtDiagnosticWithPsi<PSI> {
         abstract val candidates: List<KtSymbol>
     }
 
+    abstract class IteratorAmbiguity : KtFirDiagnostic<PsiElement>() {
+        override val diagnosticClass get() = IteratorAmbiguity::class
+        abstract val candidates: List<KtSymbol>
+    }
+
+    abstract class HasNextFunctionAmbiguity : KtFirDiagnostic<PsiElement>() {
+        override val diagnosticClass get() = HasNextFunctionAmbiguity::class
+        abstract val candidates: List<KtSymbol>
+    }
+
+    abstract class NextAmbiguity : KtFirDiagnostic<PsiElement>() {
+        override val diagnosticClass get() = NextAmbiguity::class
+        abstract val candidates: List<KtSymbol>
+    }
+
     abstract class TypeMismatch : KtFirDiagnostic<PsiElement>() {
         override val diagnosticClass get() = TypeMismatch::class
         abstract val expectedType: KtType
@@ -1055,6 +1070,10 @@ sealed class KtFirDiagnostic<PSI: PsiElement> : KtDiagnosticWithPsi<PSI> {
 
     abstract class NoSetMethod : KtFirDiagnostic<KtArrayAccessExpression>() {
         override val diagnosticClass get() = NoSetMethod::class
+    }
+
+    abstract class IteratorMissing : KtFirDiagnostic<KtExpression>() {
+        override val diagnosticClass get() = IteratorMissing::class
     }
 
     abstract class ToplevelTypealiasesOnly : KtFirDiagnostic<KtTypeAlias>() {

@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirBackingFieldSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.resolve.calls.tower.isSuccess
+import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 private fun ConeDiagnostic.toFirDiagnostic(
@@ -27,13 +28,42 @@ private fun ConeDiagnostic.toFirDiagnostic(
 ): FirDiagnostic<FirSourceElement>? = when (this) {
     is ConeUnresolvedReferenceError -> FirErrors.UNRESOLVED_REFERENCE.on(source, this.name?.asString() ?: "<No name>")
     is ConeUnresolvedSymbolError -> FirErrors.UNRESOLVED_REFERENCE.on(source, this.classId.asString())
-    is ConeUnresolvedNameError -> FirErrors.UNRESOLVED_REFERENCE.on(source, this.name.asString())
+    is ConeUnresolvedNameError -> if (source.kind == FirFakeSourceElementKind.DesugaredForLoop) {
+        when (this.name) {
+            OperatorNameConventions.ITERATOR ->
+                FirErrors.ITERATOR_MISSING.on(source)
+            // NB: here probably we should check also NEXT / HAS_NEXT names (see ConeAmbiguityError below)
+            // reporting NEXT_MISSING and HAS_NEXT missing accordingly,
+            // but yet is unclear how to prevent appearance of three these errors simultaneously
+            // in certain situations
+            else ->
+                null
+        }
+    } else {
+        FirErrors.UNRESOLVED_REFERENCE.on(source, this.name.asString())
+    }
     is ConeUnresolvedQualifierError -> FirErrors.UNRESOLVED_REFERENCE.on(source, this.qualifier)
     is ConeHiddenCandidateError -> FirErrors.HIDDEN.on(source, this.candidateSymbol)
     is ConeAmbiguityError -> if (!this.applicability.isSuccess) {
         FirErrors.NONE_APPLICABLE.on(source, this.candidates)
     } else {
-        FirErrors.OVERLOAD_RESOLUTION_AMBIGUITY.on(source, this.candidates)
+        when (source.kind) {
+            FirFakeSourceElementKind.DesugaredForLoop -> {
+                when (this.name) {
+                    OperatorNameConventions.ITERATOR ->
+                        FirErrors.ITERATOR_AMBIGUITY.on(source, this.candidates)
+                    OperatorNameConventions.HAS_NEXT ->
+                        FirErrors.HAS_NEXT_FUNCTION_AMBIGUITY.on(source, this.candidates)
+                    OperatorNameConventions.NEXT ->
+                        FirErrors.NEXT_AMBIGUITY.on(source, this.candidates)
+                    else ->
+                        FirErrors.OVERLOAD_RESOLUTION_AMBIGUITY.on(source, this.candidates)
+                }
+            }
+            else -> {
+                FirErrors.OVERLOAD_RESOLUTION_AMBIGUITY.on(source, this.candidates)
+            }
+        }
     }
     is ConeOperatorAmbiguityError -> FirErrors.ASSIGN_OPERATOR_AMBIGUITY.on(source, this.candidates)
     is ConeVariableExpectedError -> FirErrors.VARIABLE_EXPECTED.on(source)

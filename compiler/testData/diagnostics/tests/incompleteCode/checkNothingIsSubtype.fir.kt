@@ -11,6 +11,6 @@ fun test(nothing: Nothing?) {
 }
 
 fun sum(a : IntArray) : Int {
-<!UNRESOLVED_REFERENCE, UNRESOLVED_REFERENCE, UNRESOLVED_REFERENCE!>for (n
+<!ITERATOR_MISSING!>for (n
 <!SYNTAX!>return<!><!SYNTAX!><!> "?"<!>
 }
