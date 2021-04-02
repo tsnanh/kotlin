@@ -262,6 +262,14 @@ class K2Native : CLICompiler<K2NativeCompilerArguments>() {
                         DestroyRuntimeMode.ON_SHUTDOWN
                     }
                 })
+                put(GARBAGE_COLLECTOR, when (arguments.gc) {
+                    "noop" -> GC.NOOP
+                    "stms" -> GC.SINGLE_THREAD_MARK_SWEEP
+                    else -> {
+                        configuration.report(ERROR, "Unsupported GC ${arguments.gc}")
+                        GC.SINGLE_THREAD_MARK_SWEEP
+                    }
+                })
             }
         }
     }

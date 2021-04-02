@@ -8,12 +8,13 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#include "../ExtraObjectData.hpp"
-#include "../GlobalData.hpp"
-#include "../ObjectOps.hpp"
-#include "../TestSupport.hpp"
+#include "ExtraObjectData.hpp"
 #include "FinalizerHooksTestSupport.hpp"
+#include "GlobalData.hpp"
+#include "ObjectOps.hpp"
 #include "ObjectTestSupport.hpp"
+#include "TestSupport.hpp"
+#include "ThreadData.hpp"
 
 using namespace kotlin;
 
@@ -186,10 +187,10 @@ KStdVector<ObjHeader*> Alive(mm::ThreadData& threadData) {
     return objects;
 }
 
-using Color = mm::SingleThreadMarkAndSweep::ObjectData::Color;
+using Color = gc::SingleThreadMarkAndSweep::ObjectData::Color;
 
 Color GetColor(ObjHeader* objHeader) {
-    auto nodeRef = mm::ObjectFactory<mm::SingleThreadMarkAndSweep>::NodeRef::From(objHeader);
+    auto nodeRef = mm::ObjectFactory<gc::SingleThreadMarkAndSweep>::NodeRef::From(objHeader);
     return nodeRef.GCObjectData().color();
 }
 
