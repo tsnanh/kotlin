@@ -523,6 +523,11 @@ sealed class KtFirDiagnostic<PSI: PsiElement> : KtDiagnosticWithPsi<PSI> {
         abstract val violatedParameter: KtSymbol
     }
 
+    abstract class NamedParameterNotFound : KtFirDiagnostic<PsiElement>() {
+        override val diagnosticClass get() = NamedParameterNotFound::class
+        abstract val name: String
+    }
+
     abstract class Ambiguity : KtFirDiagnostic<PsiElement>() {
         override val diagnosticClass get() = Ambiguity::class
         abstract val candidates: List<KtSymbol>
