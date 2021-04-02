@@ -27,6 +27,7 @@ enum class Fruit(personal: Int) {
     }
 
     val score = personal + <!UNINITIALIZED_VARIABLE!>common<!>
+    val score2 = { personal + common }()
 }
 
 // Another example from KT-11769
