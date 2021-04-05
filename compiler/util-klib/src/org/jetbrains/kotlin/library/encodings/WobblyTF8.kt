@@ -81,8 +81,7 @@ object WobblyTF8 {
                 // 1 byte -> 7 meaningful bits
                 buffer[charsWritten++] = byte1
                 continue
-            }
-            else if (byte1 ushr 5 == 0b000_0110) {
+            } else if (byte1 ushr 5 == 0b000_0110) {
                 // 110xxxxx 10xxxxxx -> U+0080..U+07FF
                 // 2 bytes -> 11 meaningful bits
                 if (index < arraySize) {
@@ -104,8 +103,9 @@ object WobblyTF8 {
                             val byte3 = array.readByteAsInt(index)
                             if (isValidContinuation(byte3)) {
                                 index++
-                                buffer[charsWritten++] =
-                                    ((byte1 and 0b0000_1111) shl 12) or ((byte2 and 0b0011_1111) shl 6) or (byte3 and 0b0011_1111)
+                                buffer[charsWritten++] = ((byte1 and 0b0000_1111) shl 12) or
+                                        ((byte2 and 0b0011_1111) shl 6) or
+                                        (byte3 and 0b0011_1111)
                                 continue
                             }
                         }
@@ -122,14 +122,18 @@ object WobblyTF8 {
                             val byte3 = array.readByteAsInt(index)
                             if (isValidContinuation(byte3)) {
                                 index++
-                                val byte4 = array.readByteAsInt(index)
-                                if (isValidContinuation(byte4)) {
-                                    index++
-                                    val codePoint =
-                                        ((byte1 and 0b0000_0111) shl 18) or ((byte2 and 0b0011_1111) shl 12) or ((byte3 and 0b0011_1111) shl 6) or (byte4 and 0b0011_1111)
-                                    buffer[charsWritten++] = Character.highSurrogate(codePoint)
-                                    buffer[charsWritten++] = Character.lowSurrogate(codePoint)
-                                    continue
+                                if (index < arraySize) {
+                                    val byte4 = array.readByteAsInt(index)
+                                    if (isValidContinuation(byte4)) {
+                                        index++
+                                        val codePoint = ((byte1 and 0b0000_0111) shl 18) or
+                                                ((byte2 and 0b0011_1111) shl 12) or
+                                                ((byte3 and 0b0011_1111) shl 6) or
+                                                (byte4 and 0b0011_1111)
+                                        buffer[charsWritten++] = Character.highSurrogate(codePoint)
+                                        buffer[charsWritten++] = Character.lowSurrogate(codePoint)
+                                        continue
+                                    }
                                 }
                             }
                         }
