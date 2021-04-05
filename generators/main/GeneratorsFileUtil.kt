@@ -20,7 +20,7 @@ object GeneratorsFileUtil {
     fun writeFileIfContentChanged(file: File, newText: String, logNotChanged: Boolean = true) {
         val parentFile = file.parentFile
         if (!parentFile.exists()) {
-            if (isTeamCityBuild) assertTeamCityMode()
+            failOnTeamCity("Create dir `${parentFile.path}`")
             if (parentFile.mkdirs()) {
                 println("Directory created: " + parentFile.absolutePath)
             } else {
@@ -33,7 +33,7 @@ object GeneratorsFileUtil {
             }
             return
         }
-        if (isTeamCityBuild) assertTeamCityMode()
+        failOnTeamCity("Write file `${file.toPath()}`")
         val useTempFile = !SystemInfo.isWindows
         val targetFile = file.toPath()
         val tempFile =
@@ -47,8 +47,29 @@ object GeneratorsFileUtil {
         println()
     }
 
-    fun assertTeamCityMode(): Nothing {
-        throw IllegalStateException("You should commit all newly generated files before pushing them to TeamCity")
+    fun failOnTeamCity(message: String): Boolean {
+        if (!isTeamCityBuild) return false
+
+        fun String.escapeForTC(): String = StringBuilder(length).apply {
+            for (char in this@escapeForTC) {
+                append(
+                    when (char) {
+                        '|' -> "||"
+                        '\'' -> "|'"
+                        '\n' -> "|n"
+                        '\r' -> "|r"
+                        '[' -> "|["
+                        ']' -> "|]"
+                        else -> char
+                    }
+                )
+            }
+        }.toString()
+
+        val fullMessage = "[Illegal generation on TeamCity] $message\nRun generation locally and commit changes."
+
+        println("##teamcity[buildProblem description='${fullMessage.escapeForTC()}']")
+        return true
     }
 
     fun isFileContentChangedIgnoringLineSeparators(file: File, content: String): Boolean {
