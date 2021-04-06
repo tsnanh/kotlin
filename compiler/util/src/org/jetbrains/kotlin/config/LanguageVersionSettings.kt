@@ -168,9 +168,6 @@ enum class LanguageFeature(
     // Temporarily disabled, see KT-27084/KT-22379
     SoundSmartcastFromLoopConditionForLoopAssignedVariables(sinceVersion = null, kind = BUG_FIX),
 
-    // Looks like we can't enable it until KT-26245 is fixed because otherwise some use cases become broken because of overrides
-    ProhibitUsingNullableTypeParameterAgainstNotNullAnnotated(sinceVersion = null, kind = BUG_FIX),
-
     // Experimental features
 
     Coroutines(
@@ -205,6 +202,7 @@ enum class LanguageFeature(
 
     // 1.6
     DefinitelyNotNullTypeParameters(sinceVersion = KOTLIN_1_6),
+    ProhibitUsingNullableTypeParameterAgainstNotNullAnnotated(sinceVersion = KOTLIN_1_6, kind = BUG_FIX),
     ;
 
     val presentableName: String
