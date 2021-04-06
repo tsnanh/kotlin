@@ -25267,6 +25267,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
         }
 
         @Test
+        @TestMetadata("definitelyNotNullTypes.kt")
+        public void testDefinitelyNotNullTypes() throws Exception {
+            runTest("compiler/testData/codegen/box/notNullAssertions/definitelyNotNullTypes.kt");
+        }
+
+        @Test
         @TestMetadata("delegation.kt")
         public void testDelegation() throws Exception {
             runTest("compiler/testData/codegen/box/notNullAssertions/delegation.kt");

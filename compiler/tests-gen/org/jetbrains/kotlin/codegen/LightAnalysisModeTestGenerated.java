@@ -21405,6 +21405,11 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
             runTest("compiler/testData/codegen/box/notNullAssertions/callAssertions.kt");
         }
 
+        @TestMetadata("definitelyNotNullTypes.kt")
+        public void testDefinitelyNotNullTypes() throws Exception {
+            runTest("compiler/testData/codegen/box/notNullAssertions/definitelyNotNullTypes.kt");
+        }
+
         @TestMetadata("delegation.kt")
         public void testDelegation() throws Exception {
             runTest("compiler/testData/codegen/box/notNullAssertions/delegation.kt");
