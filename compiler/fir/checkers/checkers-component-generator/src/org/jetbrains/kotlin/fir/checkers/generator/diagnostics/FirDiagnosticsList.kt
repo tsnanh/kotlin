@@ -67,6 +67,7 @@ object DIAGNOSTICS_LIST : DiagnosticList() {
         val EMPTY_CHARACTER_LITERAL by error<FirSourceElement, PsiElement>()
         val TOO_MANY_CHARACTERS_IN_CHARACTER_LITERAL by error<FirSourceElement, PsiElement>()
         val ILLEGAL_ESCAPE by error<FirSourceElement, PsiElement>()
+        val WRONG_LONG_SUFFIX by error<FirSourceElement, KtElement>(PositioningStrategy.LONG_LITERAL_SUFFIX)
     }
 
     val UNRESOLVED by object : DiagnosticGroup("Unresolved") {
@@ -299,7 +300,7 @@ object DIAGNOSTICS_LIST : DiagnosticList() {
         }
 
         val UPPER_BOUND_IS_EXTENSION_FUNCTION_TYPE by error<FirSourceElement, PsiElement>()
-        
+
         val BOUNDS_NOT_ALLOWED_IF_BOUNDED_BY_TYPE_PARAMETER by error<FirSourceElement, PsiElement>()
         
         val ONLY_ONE_CLASS_BOUND_ALLOWED by error<FirSourceElement, PsiElement>()
