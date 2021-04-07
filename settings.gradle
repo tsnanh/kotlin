@@ -309,7 +309,8 @@ include ":benchmarks",
         ":kotlinx-serialization-ide-plugin",
         ":kotlin-serialization",
         ":kotlin-serialization-unshaded",
-        ":wasm:wasm.ir"
+        ":wasm:wasm.ir",
+        ":integration-tests:scala-lib-interop"
 
 
 include ":compiler:fir:cones",
