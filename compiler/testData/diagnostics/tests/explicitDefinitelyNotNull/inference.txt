@@ -1,0 +1,6 @@
+package
+
+public fun </*0*/ F> main(/*0*/ x: F): kotlin.Unit
+public fun </*0*/ K> removeQuestionMark(/*0*/ x: K?): K
+public fun </*0*/ T> toDefNotNull(/*0*/ s: T): T!!
+public fun kotlin.Any.foo(): kotlin.Unit
