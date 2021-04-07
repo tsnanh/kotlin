@@ -17,10 +17,12 @@ object GeneratorsFileUtil {
     @JvmStatic
     @JvmOverloads
     @Throws(IOException::class)
-    fun writeFileIfContentChanged(file: File, newText: String, logNotChanged: Boolean = true) {
+    fun writeFileIfContentChanged(file: File, newText: String, logNotChanged: Boolean = true, failOnTeamcity: Boolean = true) {
         val parentFile = file.parentFile
         if (!parentFile.exists()) {
-            failOnTeamCity("Create dir `${parentFile.path}`")
+            if (failOnTeamcity) {
+                failOnTeamCity("Create dir `${parentFile.path}`")
+            }
             if (parentFile.mkdirs()) {
                 println("Directory created: " + parentFile.absolutePath)
             } else {
@@ -33,7 +35,9 @@ object GeneratorsFileUtil {
             }
             return
         }
-        failOnTeamCity("Write file `${file.toPath()}`")
+        if (failOnTeamcity) {
+            failOnTeamCity("Write file `${file.toPath()}`")
+        }
         val useTempFile = !SystemInfo.isWindows
         val targetFile = file.toPath()
         val tempFile =

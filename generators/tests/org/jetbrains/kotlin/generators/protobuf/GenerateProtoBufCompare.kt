@@ -38,8 +38,8 @@ class GenerateProtoBufCompare {
             generate(DEST_FILE)
         }
 
-        fun generate(destFile: File) {
-            GeneratorsFileUtil.writeFileIfContentChanged(destFile, GenerateProtoBufCompare().generate())
+        fun generate(destFile: File, failOnTeamcity: Boolean = true) {
+            GeneratorsFileUtil.writeFileIfContentChanged(destFile, GenerateProtoBufCompare().generate(), failOnTeamcity = failOnTeamcity)
         }
     }
 
