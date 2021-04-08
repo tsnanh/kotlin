@@ -3108,6 +3108,12 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
             }
 
             @Test
+            @TestMetadata("symbolsAndDescriptors.kt")
+            public void testSymbolsAndDescriptors() throws Exception {
+                runTest("compiler/fir/analysis-tests/testData/resolve/problems/symbolsAndDescriptors.kt");
+            }
+
+            @Test
             @TestMetadata("transform.kt")
             public void testTransform() throws Exception {
                 runTest("compiler/fir/analysis-tests/testData/resolve/problems/transform.kt");
