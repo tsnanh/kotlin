@@ -764,6 +764,8 @@ internal class CAdapterGenerator(val context: Context) : DeclarationDescriptorVi
     }
 
     private fun makeScopeDefinitions(scope: ExportedElementScope, kind: DefinitionKind, indent: Int) {
+        if (scope.elements.isEmpty() && scope.scopes.isEmpty())
+            return
         if (kind == DefinitionKind.C_HEADER_STRUCT) output("struct {", indent)
         if (kind == DefinitionKind.C_SOURCE_STRUCT) output(".${scope.name} = {", indent)
         scope.elements.forEach { makeElementDefinition(it, kind, indent + 1) }
