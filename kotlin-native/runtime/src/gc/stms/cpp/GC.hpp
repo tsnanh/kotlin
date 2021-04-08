@@ -13,7 +13,7 @@ namespace gc {
 
 using GC = kotlin::gc::SingleThreadMarkAndSweep;
 
-} // namespace mm
+} // namespace gc
 } // namespace kotlin
 
 #endif // RUNTIME_GC_STMS_GC_H

@@ -13,7 +13,7 @@ namespace gc {
 
 using GC = kotlin::gc::NoOpGC;
 
-} // namespace mm
+} // namespace gc
 } // namespace kotlin
 
 #endif // RUNTIME_GC_NOOP_GC_H
