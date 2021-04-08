@@ -29,6 +29,7 @@ object CommonExpressionCheckers : ExpressionCheckers() {
 
     override val functionCallCheckers: Set<FirFunctionCallChecker> = setOf(
         FirConventionFunctionCallChecker,
+        FirDivisionByZeroChecker
     )
 
     override val tryExpressionCheckers: Set<FirTryExpressionChecker> = setOf(
